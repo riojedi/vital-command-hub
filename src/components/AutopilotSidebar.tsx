@@ -210,10 +210,7 @@ export function AutopilotSidebar() {
 
             {messages.map((m) => (
               <Message key={m.id} from={m.role}>
-                <MessageContent
-                  variant={m.role === "user" ? "contained" : "flat"}
-                  className={m.role === "user" ? "bg-secondary text-secondary-foreground" : ""}
-                >
+                <MessageContent>
                   <MessageResponse>{m.text}</MessageResponse>
                   {m.tool ? (
                     <Tool defaultOpen={false} className="mt-3 mb-0 border-border">
@@ -226,7 +223,7 @@ export function AutopilotSidebar() {
                         <ToolInput input={m.tool.command} />
                         <ToolOutput
                           output={m.tool.output ?? null}
-                          errorText={m.tool.errorText ?? null}
+                          errorText={m.tool.errorText}
                         />
                       </ToolContent>
                     </Tool>
@@ -253,7 +250,7 @@ export function AutopilotSidebar() {
               placeholder="Issue a system command…"
             />
             <PromptInputFooter className="justify-end">
-              <PromptInputSubmit status={busy ? "submitted" : undefined} disabled={!text.trim()} />
+              <PromptInputSubmit status={busy ? "submitted" : "ready"} disabled={!text.trim()} />
             </PromptInputFooter>
           </PromptInput>
         </div>
