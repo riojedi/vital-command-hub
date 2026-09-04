@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BarChart3, Gauge, ListChecks, Server, SlidersHorizontal } from "lucide-react";
+import { BarChart3, Gauge, ListChecks, Server, Settings, SlidersHorizontal } from "lucide-react";
 import mark from "@/assets/autopilot-mark.png";
 import { useHealth } from "@/lib/bridge-queries";
 
@@ -9,6 +9,7 @@ const LINKS = [
   { to: "/telemetry", label: "Telemetry", icon: Server },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/strategy", label: "Strategy", icon: SlidersHorizontal },
+  { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export function AppNav() {

@@ -119,3 +119,84 @@ export const updateConfig = createServerFn({ method: "POST" })
       body: data,
     }),
   );
+
+// ============ API key vault ============
+
+export type EnvKeyRecord = {
+  key: string;
+  /** Masked preview only — raw secret values are never returned to the browser. */
+  masked: string;
+  configured: boolean;
+  updated_at?: string | null;
+};
+
+/** Masks server-side so a raw credential can never reach the client bundle. */
+function maskValue(raw: unknown): { masked: string; configured: boolean } {
+  if (typeof raw !== "string" || raw.trim() === "") {
+    return { masked: "not set", configured: false };
+  }
+  const v = raw.trim();
+  if (v.length <= 8) return { masked: `${v.slice(0, 2)}…`, configured: true };
+  return { masked: `${v.slice(0, 5)}…${v.slice(-2)}`, configured: true };
+}
+
+export const VAULT_KEYS = [
+  "ANTHROPIC_API_KEY",
+  "DEEPSEEK_API_KEY",
+  "PERPLEXITY_API_KEY",
+  "GHOST_ADMIN_API_KEY",
+  "RESEND_API_KEY",
+  "TELEGRAM_BOT_TOKEN",
+  "TELEGRAM_CHAT_ID",
+] as const;
+
+export const getEnvKeys = createServerFn({ method: "GET" }).handler(
+  async (): Promise<BridgeResult<EnvKeyRecord[]>> => {
+    const res = await callBridge<Record<string, unknown> | Array<Record<string, unknown>>>(
+      "/api/config/env",
+    );
+    if (!res.ok) return res;
+
+    const raw = res.data;
+    const lookup = new Map<string, unknown>();
+    const meta = new Map<string, string | null>();
+
+    if (Array.isArray(raw)) {
+      for (const row of raw) {
+        const key = typeof row["key"] === "string" ? row["key"] : null;
+        if (!key) continue;
+        lookup.set(key, row["value"] ?? row["masked"] ?? row["preview"]);
+        meta.set(key, typeof row["updated_at"] === "string" ? row["updated_at"] : null);
+      }
+    } else if (raw && typeof raw === "object") {
+      const source = (raw["env"] ?? raw["keys"] ?? raw) as Record<string, unknown>;
+      for (const [key, value] of Object.entries(source)) lookup.set(key, value);
+    }
+
+    return {
+      ok: true,
+      data: VAULT_KEYS.map((key) => {
+        const incoming = lookup.get(key);
+        // The bridge may already return a masked preview; keep it, otherwise mask here.
+        if (typeof incoming === "string" && /\.\.\.|…|\*/.test(incoming)) {
+          return { key, masked: incoming, configured: true, updated_at: meta.get(key) ?? null };
+        }
+        return { key, ...maskValue(incoming), updated_at: meta.get(key) ?? null };
+      }),
+    };
+  },
+);
+
+const envUpdateSchema = z.object({
+  key: z.enum(VAULT_KEYS),
+  value: z.string().min(4).max(4096),
+});
+
+export const updateEnvKey = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => envUpdateSchema.parse(input))
+  .handler(({ data }) =>
+    callBridge<{ status?: string; message?: string }>("/api/config/env", {
+      method: "PATCH",
+      body: [{ key: data.key, value: data.value.trim() }],
+    }),
+  );

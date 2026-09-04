@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as QueueRouteImport } from './routes/queue'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as StrategyRouteImport } from './routes/strategy'
 import { Route as TelemetryRouteImport } from './routes/telemetry'
 
@@ -30,6 +31,11 @@ const QueueRoute = QueueRouteImport.update({
   path: '/queue',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StrategyRoute = StrategyRouteImport.update({
   id: '/strategy',
   path: '/strategy',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/queue': typeof QueueRoute
+  '/settings': typeof SettingsRoute
   '/strategy': typeof StrategyRoute
   '/telemetry': typeof TelemetryRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/queue': typeof QueueRoute
+  '/settings': typeof SettingsRoute
   '/strategy': typeof StrategyRoute
   '/telemetry': typeof TelemetryRoute
 }
@@ -60,21 +68,31 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/queue': typeof QueueRoute
+  '/settings': typeof SettingsRoute
   '/strategy': typeof StrategyRoute
   '/telemetry': typeof TelemetryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analytics' | '/queue' | '/strategy' | '/telemetry'
+  fullPaths:
+    '/' | '/analytics' | '/queue' | '/settings' | '/strategy' | '/telemetry'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analytics' | '/queue' | '/strategy' | '/telemetry'
-  id: '__root__' | '/' | '/analytics' | '/queue' | '/strategy' | '/telemetry'
+  to: '/' | '/analytics' | '/queue' | '/settings' | '/strategy' | '/telemetry'
+  id:
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/queue'
+    | '/settings'
+    | '/strategy'
+    | '/telemetry'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalyticsRoute: typeof AnalyticsRoute
   QueueRoute: typeof QueueRoute
+  SettingsRoute: typeof SettingsRoute
   StrategyRoute: typeof StrategyRoute
   TelemetryRoute: typeof TelemetryRoute
 }
@@ -102,6 +120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QueueRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/strategy': {
       id: '/strategy'
       path: '/strategy'
@@ -123,6 +148,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalyticsRoute: AnalyticsRoute,
   QueueRoute: QueueRoute,
+  SettingsRoute: SettingsRoute,
   StrategyRoute: StrategyRoute,
   TelemetryRoute: TelemetryRoute,
 }
