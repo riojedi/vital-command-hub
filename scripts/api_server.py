@@ -196,3 +196,97 @@ def update_config(strategy: StrategyUpdate):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db_pool.putconn(conn)
+
+
+# ============ API key vault (/api/config/env) ============
+
+VAULT_KEYS = [
+    "ANTHROPIC_API_KEY",
+    "DEEPSEEK_API_KEY",
+    "PERPLEXITY_API_KEY",
+    "GHOST_ADMIN_API_KEY",
+    "RESEND_API_KEY",
+    "TELEGRAM_BOT_TOKEN",
+    "TELEGRAM_CHAT_ID",
+]
+
+ENV_PATH = os.getenv("WEBZINE_ENV_PATH", "/app/webzine/.env")
+
+
+class EnvUpdate(BaseModel):
+    key: str
+    value: str
+
+
+def _mask(value: str) -> str:
+    value = (value or "").strip()
+    if not value:
+        return "not set"
+    if len(value) <= 8:
+        return value[:2] + "..."
+    return f"{value[:5]}...{value[-2:]}"
+
+
+def _read_env_file() -> dict:
+    values = {}
+    try:
+        with open(ENV_PATH, "r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                values[k.strip()] = v.strip().strip('"').strip("'")
+    except FileNotFoundError:
+        pass
+    return values
+
+
+@app.get("/api/config/env", dependencies=[Depends(verify_token)])
+def get_env_config():
+    """Returns masked previews only. Raw credential values are never emitted."""
+    current = _read_env_file()
+    return [
+        {"key": key, "masked": _mask(current.get(key, "")), "configured": bool(current.get(key))}
+        for key in VAULT_KEYS
+    ]
+
+
+@app.patch("/api/config/env", dependencies=[Depends(verify_token)])
+def patch_env_config(updates: List[EnvUpdate]):
+    """Rewrites the .env manifest in place, preserving unrelated entries and 600 perms."""
+    for update in updates:
+        if update.key not in VAULT_KEYS:
+            raise HTTPException(status_code=400, detail=f"Key not in vault allowlist: {update.key}")
+
+    try:
+        try:
+            with open(ENV_PATH, "r", encoding="utf-8") as fh:
+                lines = fh.read().splitlines()
+        except FileNotFoundError:
+            lines = []
+
+        for update in updates:
+            replacement = f"{update.key}={update.value.strip()}"
+            replaced = False
+            for i, line in enumerate(lines):
+                if line.strip().startswith(f"{update.key}="):
+                    lines[i] = replacement
+                    replaced = True
+                    break
+            if not replaced:
+                lines.append(replacement)
+
+        with open(ENV_PATH, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
+        os.chmod(ENV_PATH, 0o600)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return {
+        "status": "success",
+        "message": f"Updated {len(updates)} credential(s). Restart dependent containers to apply.",
+        "updated_keys": [u.key for u in updates],
+    }
