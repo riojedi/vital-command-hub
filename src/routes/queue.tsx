@@ -13,14 +13,10 @@ export const Route = createFileRoute("/queue")({
       { title: "Editorial Queue — Vital4Living Autopilot" },
       {
         name: "description",
-        content:
-          "Interactive monitor for every article in the editorial_queue table across all 15 lifecycle states, from queued to published or quarantined.",
+        content: "Interactive monitor for every article in the editorial_queue table across all 15 lifecycle states, from queued to published or quarantined.",
       },
       { property: "og:title", content: "Editorial Queue — Vital4Living Autopilot" },
-      {
-        property: "og:description",
-        content: "Track article lifecycle states, claims and verification failures in real time.",
-      },
+      { property: "og:description", content: "Track article lifecycle states, claims and verification failures in real time." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -109,27 +105,45 @@ function QueuePage() {
         </p>
       ) : null}
 
-      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-        {["all", ...QUEUE_STATES].map((state) => {
-          const count = state === "all" ? items.length : items.filter((i) => i.status === state).length;
-          return (
-            <button
-              key={state}
-              type="button"
-              onClick={() => setFilter(state)}
-              className={cn(
-                "label-caps touch-target flex items-center gap-2 rounded-md border px-3 whitespace-nowrap",
-                filter === state
-                  ? "border-foreground bg-secondary text-secondary-foreground"
-                  : "border-border hover:border-border-strong",
-                ALERT_STATES.includes(state) && filter !== state && "border-alert text-alert",
-              )}
-            >
-              {state.replace(/_/g, " ")}
-              <span className="numeric normal-case">{count}</span>
-            </button>
-          );
-        })}
+      {/* 🌟 Redesigned Responsive Filter Pill Bar to prevent vertical splitting and layout squishing */}
+      <div className="w-full border-b border-border/30 pb-4">
+        <div className="flex flex-row gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent pb-2 px-0.5">
+          {["all", ...QUEUE_STATES].map((state) => {
+            const count = state === "all" ? items.length : items.filter((i) => i.status === state).length;
+            const isSelected = filter === state;
+            const isAlertState = ALERT_STATES.includes(state);
+
+            return (
+              <button
+                key={state}
+                type="button"
+                onClick={() => setFilter(state)}
+                className={cn(
+                  "flex flex-row items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-150 shrink-0",
+                  isSelected
+                    ? "border-orange-500/40 bg-orange-500/10 text-orange-500 shadow-sm"
+                    : isAlertState
+                    ? "border-alert/30 bg-alert/5 text-alert hover:border-alert-strong"
+                    : "border-border bg-card/40 text-muted-foreground hover:border-border-strong hover:text-foreground"
+                )}
+              >
+                <span className="capitalize">{state.replace(/_/g, " ")}</span>
+                <span
+                  className={cn(
+                    "flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold min-w-[20px] transition-colors",
+                    isSelected
+                      ? "bg-orange-500 text-slate-950"
+                      : isAlertState
+                      ? "bg-alert/20 text-alert"
+                      : "bg-muted/80 text-muted-foreground"
+                  )}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <DataTable

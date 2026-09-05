@@ -40,15 +40,19 @@ type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   text: string;
-  tool?: { command: Command; state: ToolState; output?: unknown; errorText?: string };
+  tool?: {
+    command: Command;
+    state: ToolState;
+    output?: unknown;
+    errorText?: string;
+  };
 };
 
 /** Deterministic NL -> bridge payload transformation. */
 function buildCommand(input: string): Command {
-  const keywordMatch = input.match(/keywords?\s*[:\-]\s*([^.;]+)/i);
-  const blacklistMatch = input.match(/(?:blacklist|avoid|exclude|drop)\s*[:\-]?\s*([^.;]+)/i);
-  const filesystemIntent = /adsense|theme|template|config\.production|ghost\s+config/i.test(input);
-
+  const keywordMatch = input.match(/keywords?\s*[:-]\s*([^.;]+)/i);
+  const blacklistMatch = input.match(/(?:blacklist|avoid|exclude|drop)\s*[:-]?\s*([^.;]+)/i);
+  const filesystemIntent = /adsense|theme|template|config.production|ghost\s+config/i.test(input);
   const split = (value: string) =>
     value
       .split(/,| and /i)
@@ -120,60 +124,83 @@ export function AutopilotSidebar() {
       },
     ]);
 
-    const result = await applyConfig({ data: command.parameters });
-    setBusy(false);
+    try {
+      const result = await applyConfig({ data: command.parameters });
+      setBusy(false);
 
-    setMessages((m) =>
-      m.map((msg) =>
-        msg.id !== assistantId
-          ? msg
-          : {
-              ...msg,
-              text: result.ok
-                ? "`operational_strategy` updated — the next agent cycle picks up these guidelines."
-                : `Update rejected: ${result.error}`,
-              tool: {
-                command,
-                state: result.ok ? "output-available" : "output-error",
-                ...(result.ok ? { output: result.data } : { errorText: result.error }),
+      setMessages((m) =>
+        m.map((msg) =>
+          msg.id !== assistantId
+            ? msg
+            : {
+                ...msg,
+                text: result.ok
+                  ? "`operational_strategy` updated — the next agent cycle picks up these guidelines."
+                  : `Update rejected: ${result.error}`,
+                tool: {
+                  command,
+                  state: result.ok ? "output-available" : "output-error",
+                  ...(result.ok ? { output: result.data } : { errorText: result.error }),
+                },
               },
-            },
-      ),
-    );
+        )
+      );
 
-    if (result.ok) {
-      toast.success("Operational strategy updated");
-      void qc.invalidateQueries({ queryKey: ["strategy"] });
-    } else {
-      toast.error(result.error);
+      if (result.ok) {
+        toast.success("Operational strategy updated");
+        void qc.invalidateQueries({ queryKey: ["strategy"] });
+      } else {
+        toast.error(result.error);
+      }
+    } catch (err: any) {
+      setBusy(false);
+      setMessages((m) =>
+        m.map((msg) =>
+          msg.id !== assistantId
+            ? msg
+            : {
+                ...msg,
+                text: `API Bridge Connection Error: Could not reach VPS.`,
+                tool: {
+                  command,
+                  state: "output-error",
+                  errorText: err.message || "Network Error",
+                },
+              }
+        )
+      );
+      toast.error("Failed to connect to VPS API bridge");
     }
   }
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="touch-target fixed right-4 bottom-4 z-40 flex items-center gap-2 rounded-md border border-border-strong bg-card px-4 font-semibold xl:hidden"
-      >
-        <PanelRightOpen aria-hidden className="size-5 text-alert" />
-        Autopilot
-      </button>
+      {/* 🚀 Sleek floating button to slide out the Sidebar on all screen sizes */}
+      {!open && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="fixed right-6 bottom-6 z-40 flex items-center gap-2 rounded-full border border-orange-500/30 bg-slate-950/80 backdrop-blur-md px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-orange-500 shadow-2xl hover:bg-slate-900 hover:border-orange-500 transition-all duration-200"
+        >
+          <PanelRightOpen className="size-4 animate-pulse" />
+          Autopilot
+        </button>
+      )}
 
+      {/* 📐 Collapsible Drawer snapping exactly to the right */}
       <aside
-        aria-label="Autopilot AI Assistant"
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-border bg-sidebar transition-transform duration-200 xl:sticky xl:top-0 xl:z-auto xl:h-screen xl:max-w-none xl:translate-x-0",
-          open ? "translate-x-0" : "translate-x-full",
+          "fixed right-0 top-0 z-50 w-80 md:w-[360px] h-screen bg-slate-950 border-l border-slate-900 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out",
+          open ? "translate-x-0" : "translate-x-full"
         )}
       >
-        <header className="flex items-center justify-between gap-2 border-b border-border p-4">
-          <div className="flex items-center gap-3">
-            <img src={mark} alt="" loading="lazy" width={512} height={512} className="size-8" />
+        <header className="flex items-center justify-between gap-2 border-b border-slate-900 p-4 bg-slate-950/80">
+          <div className="flex items-center gap-2.5">
+            <img src={mark} alt="" loading="lazy" width={32} height={32} className="size-7 rounded-md" />
             <div>
-              <h2 className="text-lg leading-none">Autopilot</h2>
-              <p className="label-caps flex items-center gap-1">
-                <ShieldCheck aria-hidden className="size-3" /> admin_verified
+              <h2 className="text-sm font-bold text-slate-100">Autopilot</h2>
+              <p className="text-[10px] uppercase tracking-wider text-orange-500 font-semibold flex items-center gap-1">
+                <ShieldCheck className="size-3" /> admin_verified
               </p>
             </div>
           </div>
@@ -181,50 +208,53 @@ export function AutopilotSidebar() {
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Collapse assistant"
-            className="touch-target flex items-center justify-center rounded-md border border-border xl:hidden"
+            className="p-1.5 rounded-md hover:bg-slate-900 text-slate-400 hover:text-slate-100 transition-colors"
           >
-            <PanelRightClose aria-hidden className="size-5" />
+            <PanelRightClose className="size-4" />
           </button>
         </header>
 
-        <Conversation className="flex-1">
-          <ConversationContent className="gap-5">
+        <Conversation className="flex-1 bg-slate-950/20">
+          <ConversationContent className="gap-4 p-4">
             {messages.length === 0 ? (
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Natural-language control over the agent lifecycle. Commands compile to a
-                  deterministic bridge payload before execution.
-                </p>
-                {SUGGESTIONS.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => void dispatch(s)}
-                    className="w-full rounded-md border border-border p-3 text-left text-sm hover:border-border-strong"
-                  >
-                    {s}
-                  </button>
-                ))}
+              <div className="space-y-4">
+                <div className="rounded-lg border border-slate-900 bg-slate-900/60 p-3 text-xs leading-relaxed text-slate-400">
+                  Natural-language control over writing guidelines and site configuration on the VPS.
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block px-1">
+                    Suggested Commands
+                  </span>
+                  {SUGGESTIONS.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => void dispatch(s)}
+                      className="w-full text-left text-xs bg-slate-900 hover:bg-slate-900/80 border border-slate-900 hover:border-slate-800 p-2.5 rounded-lg text-slate-300 hover:text-slate-100 transition-all line-clamp-2"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : null}
 
             {messages.map((m) => (
               <Message key={m.id} from={m.role}>
                 <MessageContent>
-                  <MessageResponse>{m.text}</MessageResponse>
+                  <MessageResponse className="text-xs text-slate-300">{m.text}</MessageResponse>
                   {m.tool ? (
-                    <Tool defaultOpen={false} className="mt-3 mb-0 border-border">
+                    <Tool defaultOpen={false} className="mt-2 mb-0 border-slate-900 bg-slate-900/40">
                       <ToolHeader
                         type={`tool-${m.tool.command.action}`}
                         state={m.tool.state}
                         title={m.tool.command.action}
+                        className="text-xs py-1"
                       />
-                      <ToolContent>
+                      <ToolContent className="text-xs p-2">
                         <ToolInput input={m.tool.command} />
-                        <ToolOutput
-                          output={m.tool.output ?? null}
-                          errorText={m.tool.errorText}
-                        />
+                        <ToolOutput output={m.tool.output ?? null} errorText={m.tool.errorText} />
                       </ToolContent>
                     </Tool>
                   ) : null}
@@ -232,12 +262,12 @@ export function AutopilotSidebar() {
               </Message>
             ))}
 
-            {busy ? <Shimmer>Applying strategy…</Shimmer> : null}
+            {busy ? <Shimmer className="text-xs text-slate-400">Applying strategy…</Shimmer> : null}
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
 
-        <div className="border-t border-border p-4">
+        <div className="border-t border-slate-900 p-3 bg-slate-950/50">
           <PromptInput
             onSubmit={(_, event) => {
               event.preventDefault();
@@ -248,9 +278,10 @@ export function AutopilotSidebar() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Issue a system command…"
+              className="text-xs min-h-[40px] bg-slate-900 border-slate-900 focus:border-slate-800 rounded-lg py-2"
             />
-            <PromptInputFooter className="justify-end">
-              <PromptInputSubmit status={busy ? "submitted" : "ready"} disabled={!text.trim()} />
+            <PromptInputFooter className="justify-end pt-1">
+              <PromptInputSubmit status={busy ? "submitted" : "ready"} disabled={!text.trim()} className="size-7" />
             </PromptInputFooter>
           </PromptInput>
         </div>
