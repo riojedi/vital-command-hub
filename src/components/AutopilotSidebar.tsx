@@ -18,6 +18,7 @@ import {
 import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { updateConfig } from "@/lib/bridge.functions";
+import { vitalApi } from "@/lib/vitalApi";
 import mark from "@/assets/autopilot-mark.png";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +46,7 @@ type ChatMessage = {
     state: ToolState;
     output?: unknown;
     errorText?: string;
-  };
+  } | undefined;
 };
 
 /** Deterministic NL -> bridge payload transformation. */
@@ -73,9 +74,9 @@ function buildCommand(input: string): Command {
 }
 
 const SUGGESTIONS = [
+  "Trigger production run",
   "Make Sierra more opinionated. Keywords: Mondo sizing, boot volume",
   "Avoid: sponsored roundups, affiliate listicles",
-  "Shift the AdSense block below the first gear table",
 ];
 
 export function AutopilotSidebar() {
@@ -83,93 +84,70 @@ export function AutopilotSidebar() {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const applyConfig = useServerFn(updateConfig);
   const qc = useQueryClient();
 
   async function dispatch(raw: string) {
     const value = raw.trim();
     if (!value || busy) return;
     setText("");
-    const command = buildCommand(value);
     const userId = crypto.randomUUID();
     const assistantId = crypto.randomUUID();
 
     setMessages((m) => [...m, { id: userId, role: "user", text: value }]);
+    setBusy(true);
 
-    if (command.action === "filesystem_mutation") {
+    try {
+      const result = await vitalApi.sendAutopilotCommand(value);
+      setBusy(false);
+
+      const msgText = result.message || "Command executed successfully.";
+      const assistantMsg: ChatMessage = {
+        id: assistantId,
+        role: "assistant",
+        text: msgText,
+      };
+
+      if (result.action === "update_strategy" || result.action === "trigger_run") {
+        assistantMsg.tool = {
+          command: {
+            action: "system_config_update",
+            target_table: result.action === "trigger_run" ? "editorial_queue" : "operational_strategy",
+            parameters: {
+              active_guidelines: value,
+              priority_keywords: result.data?.priority_keywords || [],
+              blacklist_themes: result.data?.blacklist_themes || [],
+            },
+            authorization_context: "admin_verified",
+          },
+          state: "output-available",
+          output: result.data,
+        };
+      }
+
+      setMessages((m) => [...m, assistantMsg]);
+
+      if (result.action === "trigger_run") {
+        toast.success(`Autopilot: Production run initiated for topic #${result.task_id || "active"}`);
+        void qc.invalidateQueries({ queryKey: ["queue"] });
+        void qc.invalidateQueries({ queryKey: ["telemetry"] });
+        void qc.invalidateQueries({ queryKey: ["analytics"] });
+      } else if (result.action === "update_strategy") {
+        toast.success("Autopilot: Operational strategy updated in state engine.");
+        void qc.invalidateQueries({ queryKey: ["strategy"] });
+      } else {
+        toast.info("Autopilot instruction executed.");
+      }
+    } catch (err: any) {
+      setBusy(false);
       setMessages((m) => [
         ...m,
         {
           id: assistantId,
           role: "assistant",
-          text: "Filesystem intent detected — this rewrites the Ghost CMS template config on the VPS. Held for human confirmation per the emergency-control mandate.",
-          tool: {
-            command,
-            state: "output-denied",
-            output: { status: "held", reason: "requires_human_confirmation" },
-          },
+          text: `Autopilot Command Error: ${err.message || "Could not reach backend bridge."}`,
         },
       ]);
-      return;
-    }
-
-    setBusy(true);
-    setMessages((m) => [
-      ...m,
-      {
-        id: assistantId,
-        role: "assistant",
-        text: "Dispatching `PATCH /config` to the VPS bridge.",
-        tool: { command, state: "input-available" },
-      },
-    ]);
-
-    try {
-      const result = await applyConfig({ data: command.parameters });
-      setBusy(false);
-
-      setMessages((m) =>
-        m.map((msg) =>
-          msg.id !== assistantId
-            ? msg
-            : {
-                ...msg,
-                text: result.ok
-                  ? "`operational_strategy` updated — the next agent cycle picks up these guidelines."
-                  : `Update rejected: ${result.error}`,
-                tool: {
-                  command,
-                  state: result.ok ? "output-available" : "output-error",
-                  ...(result.ok ? { output: result.data } : { errorText: result.error }),
-                },
-              },
-        )
-      );
-
-      if (result.ok) {
-        toast.success("Operational strategy updated");
-        void qc.invalidateQueries({ queryKey: ["strategy"] });
-      } else {
-        toast.error(result.error);
-      }
-    } catch (err: any) {
-      setBusy(false);
-      setMessages((m) =>
-        m.map((msg) =>
-          msg.id !== assistantId
-            ? msg
-            : {
-                ...msg,
-                text: `API Bridge Connection Error: Could not reach VPS.`,
-                tool: {
-                  command,
-                  state: "output-error",
-                  errorText: err.message || "Network Error",
-                },
-              }
-        )
-      );
-      toast.error("Failed to connect to VPS API bridge");
+      toast.error(err.message || "Failed to execute autopilot command");
     }
   }
 

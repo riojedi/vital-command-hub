@@ -4,17 +4,19 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "../components/ui/sonner";
+import { toast } from "sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppNav } from "../components/AppNav";
 import { AutopilotSidebar } from "../components/AutopilotSidebar";
-
+import { getAuthToken } from "../lib/vitalApi";
 
 function NotFoundComponent() {
   return (
@@ -132,21 +134,82 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isAuthRoute = pathname === "/login" || pathname === "/signup";
+
+  const [hasActiveSession, setHasActiveSession] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return Boolean(getAuthToken());
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const token = getAuthToken();
+    const isAuthed = Boolean(token);
+    setHasActiveSession(isAuthed);
+
+    // Enforce immediate redirect to login for unauthenticated users upon initial load and navigation
+    if (!isAuthRoute && !isAuthed) {
+      router.navigate({ to: "/login", replace: true });
+    }
+
+    const handleStorage = () => {
+      const active = Boolean(getAuthToken());
+      setHasActiveSession(active);
+      if (!active && !isAuthRoute) {
+        router.navigate({ to: "/login", replace: true });
+      }
+    };
+
+    const handleUnauthorizedEvent = (e: Event) => {
+      setHasActiveSession(false);
+      const msg =
+        (e as CustomEvent)?.detail?.message || "Session expired or unauthorized. Please sign in.";
+      toast.error(msg);
+      router.navigate({ to: "/login", replace: true });
+    };
+
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("v4l:unauthorized", handleUnauthorizedEvent);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("v4l:unauthorized", handleUnauthorizedEvent);
+    };
+  }, [pathname, isAuthRoute, router]);
+
+  // Determine if protected child routes or sidebar should render
+  const canRenderContent = isAuthRoute || hasActiveSession;
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
         <AppNav />
-        <div className="mx-auto flex max-w-6xl gap-6 px-4 py-6">
+        <div
+          className={`mx-auto px-4 py-6 w-full flex-1 ${
+            isAuthRoute ? "max-w-xl" : "flex max-w-6xl gap-6"
+          }`}
+        >
           <main className="min-w-0 flex-1">
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
+            {canRenderContent ? (
+              /* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */
+              <Outlet />
+            ) : (
+              /* Unauthenticated users attempting to access dashboard sub-pages are blocked */
+              <div className="flex min-h-[60vh] flex-col items-center justify-center p-6 text-center">
+                <div className="size-10 rounded-full border-2 border-emerald-500/30 border-t-emerald-500 animate-spin mb-4" />
+                <p className="text-sm font-semibold text-foreground">Authentication required</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Active session token required. Redirecting to login card...
+                </p>
+              </div>
+            )}
           </main>
-          <AutopilotSidebar />
+          {!isAuthRoute && hasActiveSession && <AutopilotSidebar />}
         </div>
       </div>
       <Toaster />
     </QueryClientProvider>
   );
 }
-

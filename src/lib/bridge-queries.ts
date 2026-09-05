@@ -8,6 +8,7 @@ import {
   type AnalyticsPayload,
 } from "@/lib/bridge.functions";
 import type { QueueItem, TelemetryRun } from "@/lib/queue-shared";
+import { isAuthenticated } from "@/lib/vitalApi";
 
 function unwrap<T>(payload: T[] | { items?: T[]; runs?: T[] } | undefined): T[] {
   if (!payload) return [];
@@ -28,7 +29,12 @@ export function useHealth() {
 
 export function useQueueData() {
   const fn = useServerFn(getQueue);
-  const query = useQuery({ queryKey: ["queue"], queryFn: () => fn(), refetchInterval: 20_000 });
+  const query = useQuery({
+    queryKey: ["queue"],
+    queryFn: () => fn(),
+    refetchInterval: 20_000,
+    enabled: typeof window !== "undefined" ? isAuthenticated() : false,
+  });
   return {
     query,
     items: query.data?.ok ? unwrap<QueueItem>(query.data.data) : [],
@@ -38,7 +44,12 @@ export function useQueueData() {
 
 export function useTelemetryData() {
   const fn = useServerFn(getTelemetry);
-  const query = useQuery({ queryKey: ["telemetry"], queryFn: () => fn(), refetchInterval: 30_000 });
+  const query = useQuery({
+    queryKey: ["telemetry"],
+    queryFn: () => fn(),
+    refetchInterval: 30_000,
+    enabled: typeof window !== "undefined" ? isAuthenticated() : false,
+  });
   return {
     query,
     runs: query.data?.ok ? unwrap<TelemetryRun>(query.data.data) : [],
@@ -48,7 +59,12 @@ export function useTelemetryData() {
 
 export function useAnalyticsData() {
   const fn = useServerFn(getAnalytics);
-  const query = useQuery({ queryKey: ["analytics"], queryFn: () => fn(), refetchInterval: 60_000 });
+  const query = useQuery({
+    queryKey: ["analytics"],
+    queryFn: () => fn(),
+    refetchInterval: 60_000,
+    enabled: typeof window !== "undefined" ? isAuthenticated() : false,
+  });
   const data: AnalyticsPayload = query.data?.ok ? query.data.data : {};
   return {
     query,

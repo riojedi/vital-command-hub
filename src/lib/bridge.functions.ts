@@ -14,8 +14,8 @@ async function callBridge<T>(
   path: string,
   init?: { method?: string; body?: unknown },
 ): Promise<BridgeResult<T>> {
-  const baseUrl = process.env["VPS_API_BASE_URL"];
-  const token = process.env["SECURE_API_TOKEN"];
+  const baseUrl = process.env["VPS_API_BASE_URL"] || "http://15.204.83.117:8000";
+  const token = process.env["SECURE_API_TOKEN"] || "";
 
   if (!baseUrl || !token) {
     return {
@@ -26,7 +26,12 @@ async function callBridge<T>(
   }
 
   try {
-    const res = await fetch(`${baseUrl.replace(/\/$/, "")}${path}`, {
+    let cleanBase = baseUrl.replace(/\/$/, "");
+    if (cleanBase.endsWith("/api") && path.startsWith("/api")) {
+      cleanBase = cleanBase.slice(0, -4);
+    }
+    const res = await fetch(`${cleanBase}${path}`, {
+
       method: init?.method ?? "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -78,7 +83,13 @@ export type TelemetryRun = {
 };
 
 export type AnalyticsPayload = {
-  recent_publications?: Array<{ title?: string; date?: string; ghost_post_id?: string }>;
+  recent_publications?: Array<{ 
+    title?: string; 
+    date?: string; 
+    ghost_post_id?: string;
+    article_url?: string;
+    ghost_editor_url?: string;
+  }>;
   total_token_usage?: number | null;
   total_estimated_cost?: number | null;
 };
@@ -112,8 +123,9 @@ const configSchema = z.object({
 });
 
 export const updateConfig = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => configSchema.parse(input))
+  .validator((input: unknown) => configSchema.parse(input))
   .handler(({ data }) =>
+
     callBridge<{ status: string; message?: string }>("/config", {
       method: "PATCH",
       body: data,
@@ -193,8 +205,9 @@ const envUpdateSchema = z.object({
 });
 
 export const updateEnvKey = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => envUpdateSchema.parse(input))
+  .validator((input: unknown) => envUpdateSchema.parse(input))
   .handler(({ data }) =>
+
     callBridge<{ status?: string; message?: string }>("/api/config/env", {
       method: "PATCH",
       body: [{ key: data.key, value: data.value.trim() }],

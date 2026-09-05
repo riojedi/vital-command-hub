@@ -10,9 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AgentControlCenterRouteImport } from './routes/agent-control-center'
+import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as StrategyRouteImport } from './routes/strategy'
 import { Route as TelemetryRouteImport } from './routes/telemetry'
 
@@ -21,9 +25,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgentControlCenterRoute = AgentControlCenterRouteImport.update({
+  id: '/agent-control-center',
+  path: '/agent-control-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentsRoute = AgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QueueRoute = QueueRouteImport.update({
@@ -34,6 +53,11 @@ const QueueRoute = QueueRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StrategyRoute = StrategyRouteImport.update({
@@ -49,50 +73,89 @@ const TelemetryRoute = TelemetryRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agent-control-center': typeof AgentControlCenterRoute
+  '/agents': typeof AgentsRoute
   '/analytics': typeof AnalyticsRoute
+  '/login': typeof LoginRoute
   '/queue': typeof QueueRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/strategy': typeof StrategyRoute
   '/telemetry': typeof TelemetryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agent-control-center': typeof AgentControlCenterRoute
+  '/agents': typeof AgentsRoute
   '/analytics': typeof AnalyticsRoute
+  '/login': typeof LoginRoute
   '/queue': typeof QueueRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/strategy': typeof StrategyRoute
   '/telemetry': typeof TelemetryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/agent-control-center': typeof AgentControlCenterRoute
+  '/agents': typeof AgentsRoute
   '/analytics': typeof AnalyticsRoute
+  '/login': typeof LoginRoute
   '/queue': typeof QueueRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/strategy': typeof StrategyRoute
   '/telemetry': typeof TelemetryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/analytics' | '/queue' | '/settings' | '/strategy' | '/telemetry'
+    | '/'
+    | '/agent-control-center'
+    | '/agents'
+    | '/analytics'
+    | '/login'
+    | '/queue'
+    | '/settings'
+    | '/signup'
+    | '/strategy'
+    | '/telemetry'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analytics' | '/queue' | '/settings' | '/strategy' | '/telemetry'
+  to:
+    | '/'
+    | '/agent-control-center'
+    | '/agents'
+    | '/analytics'
+    | '/login'
+    | '/queue'
+    | '/settings'
+    | '/signup'
+    | '/strategy'
+    | '/telemetry'
   id:
     | '__root__'
     | '/'
+    | '/agent-control-center'
+    | '/agents'
     | '/analytics'
+    | '/login'
     | '/queue'
     | '/settings'
+    | '/signup'
     | '/strategy'
     | '/telemetry'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AgentControlCenterRoute: typeof AgentControlCenterRoute
+  AgentsRoute: typeof AgentsRoute
   AnalyticsRoute: typeof AnalyticsRoute
+  LoginRoute: typeof LoginRoute
   QueueRoute: typeof QueueRoute
   SettingsRoute: typeof SettingsRoute
+  SignupRoute: typeof SignupRoute
   StrategyRoute: typeof StrategyRoute
   TelemetryRoute: typeof TelemetryRoute
 }
@@ -106,11 +169,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agent-control-center': {
+      id: '/agent-control-center'
+      path: '/agent-control-center'
+      fullPath: '/agent-control-center'
+      preLoaderRoute: typeof AgentControlCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents': {
+      id: '/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AgentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/analytics': {
       id: '/analytics'
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/queue': {
@@ -125,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/strategy': {
@@ -146,9 +237,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AgentControlCenterRoute: AgentControlCenterRoute,
+  AgentsRoute: AgentsRoute,
   AnalyticsRoute: AnalyticsRoute,
+  LoginRoute: LoginRoute,
   QueueRoute: QueueRoute,
   SettingsRoute: SettingsRoute,
+  SignupRoute: SignupRoute,
   StrategyRoute: StrategyRoute,
   TelemetryRoute: TelemetryRoute,
 }

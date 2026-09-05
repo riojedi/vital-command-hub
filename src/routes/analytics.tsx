@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, BarChart3, DollarSign, FileText, RefreshCw, Zap } from "lucide-react";
+import { AlertTriangle, BarChart3, DollarSign, FileText, RefreshCw, Zap, ExternalLink } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -35,7 +35,13 @@ export const Route = createFileRoute("/analytics")({
   component: AnalyticsPage,
 });
 
-type Publication = { title?: string; date?: string; ghost_post_id?: string };
+type Publication = { 
+  title?: string; 
+  date?: string; 
+  ghost_post_id?: string;
+  article_url?: string;
+  ghost_editor_url?: string;
+};
 
 function AnalyticsPage() {
   const { publications, totalCost, totalTokens, error, query } = useAnalyticsData();
@@ -55,7 +61,22 @@ function AnalyticsPage() {
       key: "title",
       header: "Title",
       sortValue: (r) => r.title ?? "",
-      render: (r) => <span className="font-semibold">{r.title ?? "Untitled"}</span>,
+      render: (r) => {
+        const articleUrl = r.article_url || (r.ghost_post_id ? `http://15.204.83.117:2368/p/${r.ghost_post_id}/` : null);
+        return articleUrl ? (
+          <a
+            href={articleUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-zinc-100 hover:text-emerald-400 hover:underline inline-flex items-center gap-1.5 group"
+          >
+            <span>{r.title ?? "Untitled"}</span>
+            <ExternalLink className="size-3.5 opacity-50 group-hover:opacity-100 text-emerald-400 shrink-0" />
+          </a>
+        ) : (
+          <span className="font-semibold">{r.title ?? "Untitled"}</span>
+        );
+      },
     },
     {
       key: "date",
@@ -69,9 +90,26 @@ function AnalyticsPage() {
     },
     {
       key: "ghost",
-      header: "Ghost post ID",
+      header: "Ghost Post",
       sortValue: (r) => r.ghost_post_id ?? "",
-      render: (r) => <span className="numeric text-sm">{r.ghost_post_id ?? "—"}</span>,
+      render: (r) => {
+        const editorUrl = r.ghost_editor_url || (r.ghost_post_id ? `http://15.204.83.117/ghost/#/editor/post/${r.ghost_post_id}` : null);
+        if (!r.ghost_post_id) return <span className="numeric text-sm text-zinc-600">—</span>;
+        return editorUrl ? (
+          <a
+            href={editorUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open in Ghost Admin Editor"
+            className="numeric text-xs font-mono text-emerald-400 hover:underline inline-flex items-center gap-1 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800 hover:border-emerald-500 transition"
+          >
+            <span>{r.ghost_post_id.slice(0, 10)}…</span>
+            <ExternalLink className="size-3 shrink-0" />
+          </a>
+        ) : (
+          <span className="numeric text-sm">{r.ghost_post_id}</span>
+        );
+      },
     },
   ];
 

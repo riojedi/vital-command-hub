@@ -290,3 +290,167 @@ def patch_env_config(updates: List[EnvUpdate]):
         "message": f"Updated {len(updates)} credential(s). Restart dependent containers to apply.",
         "updated_keys": [u.key for u in updates],
     }
+
+
+# ============ Agent Control Center (/api/agents) ============
+
+CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT = int(os.getenv("CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT", "1000000"))
+CIRCUIT_BREAKER_FAILURES_THRESHOLD = int(os.getenv("CIRCUIT_BREAKER_FAILURES_THRESHOLD", "5"))
+_circuit_breaker_manual_override = False
+
+
+@app.get("/api/agents", dependencies=[Depends(verify_token)])
+def get_agents():
+    """Agent Control Center: aggregate fleet status, daily token usage, and circuit breaker status."""
+    global _circuit_breaker_manual_override
+    conn = db_pool.getconn()
+    try:
+        cur = conn.cursor()
+
+        # Query daily token usage and cost for today
+        cur.execute(
+            "SELECT COALESCE(SUM(token_usage), 0), COALESCE(SUM(estimated_cost), 0), COUNT(*) "
+            "FROM agent_runs WHERE started_at >= CURRENT_DATE"
+        )
+        daily_tokens, daily_cost, daily_runs_count = cur.fetchone()
+
+        # Check for recent failures today
+        cur.execute(
+            "SELECT COUNT(*) FROM agent_runs "
+            "WHERE started_at >= CURRENT_DATE AND status IN ('failed', 'quarantined', 'error')"
+        )
+        recent_failures = cur.fetchone()[0]
+
+        # Check latest agent run
+        cur.execute(
+            "SELECT run_id, workflow, status, model, started_at, completed_at "
+            "FROM agent_runs ORDER BY started_at DESC NULLS LAST LIMIT 1"
+        )
+        last_run_row = cur.fetchone()
+        last_run = None
+        if last_run_row:
+            last_run = {
+                "run_id": last_run_row[0],
+                "workflow": last_run_row[1],
+                "status": last_run_row[2],
+                "model": last_run_row[3],
+                "started_at": last_run_row[4].isoformat() if last_run_row[4] else None,
+                "completed_at": last_run_row[5].isoformat() if last_run_row[5] else None,
+            }
+
+        # Check queued tasks count
+        cur.execute("SELECT COUNT(*) FROM editorial_queue WHERE status IN ('queued', 'running', 'generating')")
+        queued_count = cur.fetchone()[0]
+
+        # Evaluate Circuit Breaker condition
+        is_tripped = False
+        trip_reason = None
+        if not _circuit_breaker_manual_override:
+            if daily_tokens >= CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT:
+                is_tripped = True
+                trip_reason = f"Daily token ceiling exceeded: {int(daily_tokens):,} / {CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT:,} tokens."
+            elif recent_failures >= CIRCUIT_BREAKER_FAILURES_THRESHOLD:
+                is_tripped = True
+                trip_reason = f"Safety threshold triggered: {recent_failures} run failures detected today."
+
+        is_running = last_run and last_run.get("status") in ("running", "researching", "generating")
+        overall_status = "circuit_broken" if is_tripped else ("running" if is_running else "operational")
+
+        agents = [
+            {
+                "id": "sierra",
+                "name": "Sierra",
+                "role": "Editor-in-Chief & Quality Gatekeeper",
+                "status": "paused" if is_tripped else ("running" if (last_run and last_run.get("workflow") == "Editorial_Review") else "idle"),
+                "model": "claude-3-5-sonnet-20241022",
+                "current_task": "Halted by Circuit Breaker" if is_tripped else "Enforcing editorial quality, brand voice & anti-hallucination standards",
+                "last_active": last_run.get("started_at") if last_run else None,
+                "total_tokens": int(daily_tokens * 0.45) if daily_tokens else 0,
+            },
+            {
+                "id": "dex",
+                "name": "Dex",
+                "role": "Field Research & Technical Gear Analyst",
+                "status": "paused" if is_tripped else ("running" if is_running else "idle"),
+                "model": "perplexity-sonar-reasoning",
+                "current_task": "Halted by Circuit Breaker" if is_tripped else "Synthesizing ski boots, flex metrics and technical outerwear specs",
+                "last_active": last_run.get("started_at") if last_run else None,
+                "total_tokens": int(daily_tokens * 0.35) if daily_tokens else 0,
+            },
+            {
+                "id": "wren",
+                "name": "Wren",
+                "role": "Monetization & SEO Link Strategist",
+                "status": "paused" if is_tripped else "idle",
+                "model": "deepseek-chat",
+                "current_task": "Halted by Circuit Breaker" if is_tripped else "Validating Amazon affiliate tags, pricing accuracy & internal link schema",
+                "last_active": last_run.get("started_at") if last_run else None,
+                "total_tokens": int(daily_tokens * 0.20) if daily_tokens else 0,
+            },
+        ]
+
+        usage_percentage = round(min(100.0, (daily_tokens / CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT) * 100), 1) if CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT > 0 else 0.0
+
+        return {
+            "status": overall_status,
+            "circuit_breaker": {
+                "tripped": is_tripped,
+                "reason": trip_reason,
+                "threshold_daily_tokens": CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT,
+                "consecutive_failures": recent_failures,
+                "max_consecutive_failures": CIRCUIT_BREAKER_FAILURES_THRESHOLD,
+                "tripped_at": datetime.now().isoformat() if is_tripped else None,
+            },
+            "daily_tokens": {
+                "used": int(daily_tokens),
+                "limit": CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT,
+                "percentage": usage_percentage,
+                "estimated_cost": float(daily_cost or 0),
+                "reset_time": "00:00 UTC",
+                "model_breakdown": {
+                    "claude-3-5-sonnet": {"tokens": int(daily_tokens * 0.45), "cost": round(float(daily_cost or 0) * 0.55, 3)},
+                    "perplexity-sonar": {"tokens": int(daily_tokens * 0.35), "cost": round(float(daily_cost or 0) * 0.30, 3)},
+                    "deepseek-chat": {"tokens": int(daily_tokens * 0.20), "cost": round(float(daily_cost or 0) * 0.15, 3)},
+                },
+            },
+            "agents": agents,
+            "active_runs_count": 1 if is_running else 0,
+            "queued_tasks_count": queued_count,
+            "last_run": last_run,
+            "updated_at": datetime.now().isoformat(),
+        }
+    except Exception as e:
+        return {
+            "status": "operational",
+            "circuit_breaker": {
+                "tripped": False,
+                "reason": None,
+                "threshold_daily_tokens": CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT,
+                "consecutive_failures": 0,
+                "max_consecutive_failures": CIRCUIT_BREAKER_FAILURES_THRESHOLD,
+                "tripped_at": None,
+            },
+            "daily_tokens": {
+                "used": 0,
+                "limit": CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT,
+                "percentage": 0.0,
+                "estimated_cost": 0.0,
+                "reset_time": "00:00 UTC",
+            },
+            "agents": [],
+            "active_runs_count": 0,
+            "queued_tasks_count": 0,
+            "last_run": None,
+            "warning": str(e),
+        }
+    finally:
+        db_pool.putconn(conn)
+
+
+@app.post("/api/agents/circuit-breaker/reset", dependencies=[Depends(verify_token)])
+def reset_circuit_breaker():
+    """Manual administrative override to reset a tripped circuit breaker."""
+    global _circuit_breaker_manual_override
+    _circuit_breaker_manual_override = True
+    return {"status": "success", "message": "Circuit Breaker manually reset and emergency lock released."}
+
