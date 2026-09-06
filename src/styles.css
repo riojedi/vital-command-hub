@@ -72,23 +72,23 @@
 :root {
   --radius: 0.25rem;
 
-  --background: oklch(0.16 0.008 250);
+  --background: oklch(0.13 0.006 250);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.215 0.01 250);
+  --card: oklch(0.17 0.008 250);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.19 0.01 250);
+  --popover: oklch(0.15 0.008 250);
   --popover-foreground: oklch(0.985 0 0);
 
   --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.16 0.008 250);
+  --primary-foreground: oklch(0.13 0.006 250);
 
-  --secondary: oklch(0.28 0.012 250);
+  --secondary: oklch(0.24 0.01 250);
   --secondary-foreground: oklch(0.985 0 0);
 
-  --muted: oklch(0.26 0.01 250);
-  --muted-foreground: oklch(0.78 0.012 250);
+  --muted: oklch(0.22 0.008 250);
+  --muted-foreground: oklch(0.75 0.012 250);
 
-  --accent: oklch(0.3 0.014 250);
+  --accent: oklch(0.26 0.012 250);
   --accent-foreground: oklch(0.985 0 0);
 
   /* #ff4a00 — safety orange, alerts only */
@@ -104,9 +104,9 @@
   --destructive: oklch(0.664 0.246 38.2);
   --destructive-foreground: oklch(0.985 0 0);
 
-  --border: oklch(0.34 0.012 250);
-  --border-strong: oklch(0.52 0.014 250);
-  --input: oklch(0.34 0.012 250);
+  --border: oklch(0.28 0.01 250);
+  --border-strong: oklch(0.44 0.012 250);
+  --input: oklch(0.28 0.01 250);
   --ring: oklch(0.664 0.246 38.2);
 
   --chart-1: oklch(0.664 0.246 38.2);
@@ -115,18 +115,18 @@
   --chart-4: oklch(0.72 0.11 230);
   --chart-5: oklch(0.85 0.02 250);
 
-  --sidebar: oklch(0.19 0.01 250);
+  --sidebar: oklch(0.15 0.008 250);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.664 0.246 38.2);
-  --sidebar-primary-foreground: oklch(0.16 0.008 250);
-  --sidebar-accent: oklch(0.28 0.012 250);
+  --sidebar-primary-foreground: oklch(0.13 0.006 250);
+  --sidebar-accent: oklch(0.24 0.01 250);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.34 0.012 250);
+  --sidebar-border: oklch(0.28 0.01 250);
   --sidebar-ring: oklch(0.664 0.246 38.2);
 }
 
 .dark {
-  --background: oklch(0.16 0.008 250);
+  --background: oklch(0.13 0.006 250);
   --foreground: oklch(0.985 0 0);
 }
 
@@ -157,6 +157,22 @@
     font-weight: 800;
     letter-spacing: -0.015em;
   }
+
+  /* Sleek monospaced dashboard scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(63 63 70 / 0.5);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(82 82 91 / 0.8);
+  }
 }
 
 /* Minimum 48px touch target for gloved field use */
@@ -183,4 +199,39 @@
   background-color: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+}
+
+/* Glassmorphism & Canvas Design System Utilities */
+@utility glass-panel {
+  background-color: rgb(9 9 11 / 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  box-shadow: 0 8px 32px 0 rgb(0 0 0 / 0.4);
+}
+
+@utility glass-panel-interactive {
+  background-color: rgb(9 9 11 / 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  box-shadow: 0 8px 32px 0 rgb(0 0 0 / 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@utility telemetry-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background-color: rgb(24 24 27 / 0.85);
+  color: rgb(228 228 231);
+}
+
+@utility iridescent-edge {
+  background-image: linear-gradient(to right, rgb(245 158 11 / 0.9), rgb(16 185 129 / 0.9), rgb(99 102 241 / 0.9));
 }

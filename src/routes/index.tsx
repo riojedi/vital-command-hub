@@ -20,6 +20,7 @@ import {
   ExternalLink,
   X,
   Users,
+  ArrowUpRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MetricCard } from "@/components/MetricCard";
@@ -330,24 +331,44 @@ function Overview() {
       {activeTab === "dashboard" && (
         <div className="space-y-6">
           {/* Executive C-Suite Boardroom & Nyx Salinger Syndication Broadcast Strip */}
-          <div className="rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 p-4 shadow-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="size-10 rounded-lg bg-emerald-950 border border-emerald-800/60 text-emerald-400 flex items-center justify-center font-display font-extrabold text-xs shrink-0 shadow-md shadow-emerald-950/40">
-                NS
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-zinc-950/90 via-zinc-900/80 to-zinc-950/90 backdrop-blur-xl p-5 shadow-2xl transition-all duration-300 hover:border-white/20 hover:shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 group">
+            {/* Iridescent Top Edge Line */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500 via-emerald-400 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+
+            {/* Ambient Backlight Glows */}
+            <div className="absolute -top-12 -right-12 w-44 h-44 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -left-12 w-44 h-44 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative flex items-center gap-4">
+              {/* Avatar with Gradient Ring & Live Radar */}
+              <div className="relative size-12 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 p-[1.5px] shadow-lg shadow-amber-500/20 shrink-0 group-hover:scale-105 transition-transform duration-300">
+                <div className="w-full h-full rounded-[10px] bg-zinc-950/90 backdrop-blur-md flex items-center justify-center font-display font-black text-sm text-amber-300 tracking-wider">
+                  NS
+                </div>
+                {/* Live ping beacon */}
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-zinc-950" />
+                </span>
               </div>
+
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-white">
-                    Nyx Salinger (Director of Social Media)
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-black text-white tracking-wide font-display">
+                    Nyx Salinger
                   </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60 flex items-center gap-1">
-                    <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live
-                    Syndicating
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-800/60">
+                    Director of Social Media
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 flex items-center gap-1.5 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                    <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
+                    Live Syndicating
                   </span>
                 </div>
-                <p className="text-xs text-zinc-400 mt-0.5">
-                  Multi-channel syndication active across 6 platforms &bull; 384.2k 24h impressions
-                  &bull; Rich Pin &amp; Meta hooks streaming
+                <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                  Omni-channel syndication active across 6 networks &bull;{" "}
+                  <span className="font-mono text-zinc-300 font-semibold">384.2k</span> 24h impressions &bull;{" "}
+                  Rich Pin &amp; Meta AI hooks streaming live
                 </p>
               </div>
             </div>
@@ -355,10 +376,11 @@ function Overview() {
             <button
               type="button"
               onClick={() => setActiveTab("boardroom")}
-              className="px-3.5 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white text-xs font-bold transition flex items-center gap-2 shrink-0 border border-zinc-700"
+              className="relative group/btn overflow-hidden px-4 py-2.5 rounded-xl bg-gradient-to-r from-zinc-800/90 to-zinc-900/90 hover:from-emerald-950/60 hover:to-zinc-900/90 text-zinc-200 hover:text-white text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 shrink-0 border border-white/10 hover:border-emerald-500/40 shadow-lg hover:shadow-emerald-950/30 active:scale-[0.98]"
             >
+              <Users className="size-3.5 text-emerald-400 group-hover/btn:scale-110 transition-transform" />
               <span>Enter Boardroom</span>
-              <ExternalLink className="size-3.5 text-emerald-400" />
+              <ArrowUpRight className="size-3.5 text-zinc-400 group-hover/btn:text-emerald-400 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
             </button>
           </div>
 

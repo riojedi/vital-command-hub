@@ -123,6 +123,145 @@ const PLATFORM_META: Record<
   },
 };
 
+const OFFICER_STYLES: Record<
+  string,
+  {
+    roleTag: string;
+    avatarGradient: string;
+    avatarText: string;
+    accentColor: string;
+    borderGradient: string;
+    glowColor: string;
+    ringColor: string;
+  }
+> = {
+  aiden: {
+    roleTag: "CHIEF EXECUTIVE",
+    avatarGradient: "from-amber-400 via-amber-500 to-emerald-600",
+    avatarText: "text-zinc-950 font-black",
+    accentColor: "text-amber-300",
+    borderGradient: "from-amber-500/50 via-emerald-500/40 to-transparent",
+    glowColor: "rgba(245,158,11,0.25)",
+    ringColor: "ring-amber-500/50 border-amber-500/60",
+  },
+  kaelen: {
+    roleTag: "SYSTEMS ARCHITECT",
+    avatarGradient: "from-cyan-400 via-sky-500 to-blue-600",
+    avatarText: "text-zinc-950 font-black",
+    accentColor: "text-cyan-300",
+    borderGradient: "from-cyan-500/50 via-blue-500/40 to-transparent",
+    glowColor: "rgba(6,182,212,0.25)",
+    ringColor: "ring-cyan-500/50 border-cyan-500/60",
+  },
+  sloane: {
+    roleTag: "CAPITAL & QUANT",
+    avatarGradient: "from-emerald-400 via-teal-500 to-cyan-600",
+    avatarText: "text-zinc-950 font-black",
+    accentColor: "text-emerald-300",
+    borderGradient: "from-emerald-500/50 via-teal-500/40 to-transparent",
+    glowColor: "rgba(16,185,129,0.25)",
+    ringColor: "ring-emerald-500/50 border-emerald-500/60",
+  },
+  rowan: {
+    roleTag: "OPERATIONS MASTER",
+    avatarGradient: "from-orange-400 via-amber-500 to-yellow-600",
+    avatarText: "text-zinc-950 font-black",
+    accentColor: "text-orange-300",
+    borderGradient: "from-orange-500/50 via-amber-500/40 to-transparent",
+    glowColor: "rgba(249,115,22,0.25)",
+    ringColor: "ring-orange-500/50 border-orange-500/60",
+  },
+  nyx: {
+    roleTag: "PRESIDING OFFICER",
+    avatarGradient: "from-emerald-400 via-teal-300 to-emerald-500",
+    avatarText: "text-zinc-950 font-black",
+    accentColor: "text-emerald-400",
+    borderGradient: "from-emerald-400 via-teal-400 to-rose-400",
+    glowColor: "rgba(16,185,129,0.35)",
+    ringColor: "ring-emerald-400/70 border-emerald-400/90",
+  },
+  sierra: {
+    roleTag: "EDITORIAL ARBITER",
+    avatarGradient: "from-indigo-400 via-sky-500 to-cyan-600",
+    avatarText: "text-zinc-950 font-black",
+    accentColor: "text-indigo-300",
+    borderGradient: "from-indigo-500/50 via-sky-500/40 to-transparent",
+    glowColor: "rgba(99,102,241,0.25)",
+    ringColor: "ring-indigo-500/50 border-indigo-500/60",
+  },
+  dex: {
+    roleTag: "FIELD TELEMETRY",
+    avatarGradient: "from-lime-400 via-emerald-500 to-teal-600",
+    avatarText: "text-zinc-950 font-black",
+    accentColor: "text-lime-300",
+    borderGradient: "from-lime-500/50 via-emerald-500/40 to-transparent",
+    glowColor: "rgba(132,204,22,0.25)",
+    ringColor: "ring-lime-500/50 border-lime-500/60",
+  },
+  wren: {
+    roleTag: "AFFILIATE YIELD",
+    avatarGradient: "from-fuchsia-400 via-purple-500 to-violet-600",
+    avatarText: "text-zinc-950 font-black",
+    accentColor: "text-fuchsia-300",
+    borderGradient: "from-fuchsia-500/50 via-purple-500/40 to-transparent",
+    glowColor: "rgba(217,70,239,0.25)",
+    ringColor: "ring-fuchsia-500/50 border-fuchsia-500/60",
+  },
+};
+
+const DEFAULT_OFFICER_STYLE = {
+  roleTag: "EXECUTIVE DAIS",
+  avatarGradient: "from-zinc-700 to-zinc-900",
+  avatarText: "text-zinc-200",
+  accentColor: "text-zinc-300",
+  borderGradient: "from-zinc-500/40 via-zinc-700/30 to-transparent",
+  glowColor: "rgba(161,161,170,0.15)",
+  ringColor: "ring-zinc-500/40 border-zinc-600",
+};
+
+function OfficerStatusBadge({ status }: { status: BoardroomOfficer["status"] }) {
+  switch (status) {
+    case "broadcasting":
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.25)] backdrop-blur-md">
+          <span className="relative flex size-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full size-2 bg-emerald-400" />
+          </span>
+          Broadcasting
+        </span>
+      );
+    case "online":
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-teal-500/15 text-teal-300 border border-teal-500/30 shadow-[0_0_10px_rgba(20,184,166,0.15)] backdrop-blur-md">
+          <span className="size-1.5 rounded-full bg-teal-400 animate-pulse" />
+          Online
+        </span>
+      );
+    case "optimizing":
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/15 text-purple-300 border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.15)] backdrop-blur-md">
+          <span className="size-1.5 rounded-full bg-purple-400" />
+          Optimizing
+        </span>
+      );
+    case "reviewing":
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-500/15 text-sky-300 border border-sky-500/30 shadow-[0_0_10px_rgba(14,165,233,0.15)] backdrop-blur-md">
+          <span className="size-1.5 rounded-full bg-sky-400" />
+          Reviewing
+        </span>
+      );
+    default:
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-zinc-800/80 text-zinc-400 border border-zinc-700/60 backdrop-blur-md">
+          <span className="size-1.5 rounded-full bg-zinc-500" />
+          Standby
+        </span>
+      );
+  }
+}
+
 export function CSuiteBoardroom() {
   // Boardroom officer selection
   const [officers, setOfficers] = useState<BoardroomOfficer[]>([]);
@@ -470,39 +609,50 @@ export function CSuiteBoardroom() {
   const selectedOfficer = officers.find((o) => o.id === selectedOfficerId) || officers[0];
 
   return (
-    <div className="space-y-6">
-      {/* 1. Executive Boardroom Header & Master Syndication Controls */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl relative overflow-hidden">
-        <div className="absolute -top-24 -right-24 size-96 bg-emerald-500/5 blur-3xl rounded-full pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 size-96 bg-rose-500/5 blur-3xl rounded-full pointer-events-none" />
+    <div className="relative space-y-8 pb-16 text-zinc-100">
+      {/* Subtle Glowing Radial Gradients Background Canvas */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-0 left-1/4 -translate-x-1/2 w-[700px] h-[450px] bg-emerald-500/[0.04] rounded-full blur-[140px]" />
+        <div className="absolute top-48 right-1/4 translate-x-1/2 w-[600px] h-[450px] bg-indigo-500/[0.04] rounded-full blur-[140px]" />
+        <div className="absolute top-2/3 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-amber-500/[0.03] rounded-full blur-[160px]" />
+      </div>
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10">
+      {/* 1. Executive Boardroom Header & Master Syndication Controls */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-900/80 via-zinc-950/90 to-zinc-950/95 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl transition-all duration-300">
+        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-amber-500/80 via-emerald-400/80 to-indigo-500/80" />
+        <div className="absolute -top-32 -right-32 size-[28rem] bg-emerald-500/10 blur-[90px] rounded-full pointer-events-none" />
+        <div className="absolute -bottom-32 -left-32 size-[28rem] bg-indigo-500/10 blur-[90px] rounded-full pointer-events-none" />
+
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 relative z-10">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
-              <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Interactive C-Suite Boardroom • Operational Session #2026-V4L</span>
+              <span className="relative flex size-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full size-2 bg-emerald-400" />
+              </span>
+              <span>Interactive C-Suite Boardroom &bull; Operational Session #2026-V4L</span>
             </div>
-            <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-              <span>Executive Command Dais</span>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full border border-zinc-700 bg-zinc-900 text-zinc-300">
+            <h1 className="mt-1.5 text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+              <span className="font-display">Executive Command Dais</span>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 shadow-sm">
                 Quorum {officers.length > 0 ? `${officers.length}/${officers.length}` : "8/8"} Seated
               </span>
             </h1>
-            <p className="mt-1 text-xs sm:text-sm text-zinc-400 max-w-2xl">
+            <p className="mt-1.5 text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
               Live multi-channel syndication floor and dynamic boardroom widget ecosystem governed
               by <strong className="text-zinc-200">Nyx Salinger (Director of Social Media)</strong>.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
             {/* Auto-Syndication Broadcast Toggle */}
             <button
               type="button"
               onClick={handleToggleAutoSyndication}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition border ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 backdrop-blur-md border hover:-translate-y-0.5 active:scale-95 ${
                 autoSyndicate
-                  ? "bg-emerald-950/60 text-emerald-400 border-emerald-800 hover:bg-emerald-900/60"
-                  : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white"
+                  ? "bg-emerald-950/60 text-emerald-300 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.25)] hover:bg-emerald-900/60"
+                  : "bg-zinc-900/80 text-zinc-400 border-white/10 hover:text-white hover:border-white/20"
               }`}
               title="Toggle automatic Ghost-to-Social broadcast engine"
             >
@@ -523,7 +673,7 @@ export function CSuiteBoardroom() {
             <button
               type="button"
               onClick={() => setIsDispatchModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-extrabold tracking-wide uppercase shadow-lg shadow-emerald-950/40 hover:scale-[1.02] active:scale-95 transition cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-zinc-950 text-xs font-black tracking-wide uppercase shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer"
             >
               <Send className="size-3.5" />
               <span>Dispatch Blast</span>
@@ -533,7 +683,7 @@ export function CSuiteBoardroom() {
             <button
               type="button"
               onClick={() => setIsWidgetModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-semibold transition"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-white/10 bg-zinc-900/70 hover:bg-zinc-800/80 text-zinc-200 text-xs font-semibold backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
               title="Configure and reorder dynamic boardroom widgets"
             >
               <SlidersHorizontal className="size-3.5 text-zinc-400" />
@@ -548,7 +698,7 @@ export function CSuiteBoardroom() {
                 void loadData();
               }}
               disabled={refreshing}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-zinc-800 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-400 hover:text-white text-xs transition disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/10 bg-zinc-900/70 hover:bg-zinc-800/80 text-zinc-400 hover:text-white text-xs backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
               title="Refresh live streams and metrics"
             >
               <RefreshCw
@@ -559,125 +709,121 @@ export function CSuiteBoardroom() {
         </div>
 
         {/* Boardroom KPI Strip */}
-        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-zinc-800/80 text-xs">
-          <div className="bg-zinc-900/40 rounded-lg p-2.5 border border-zinc-800/50">
-            <span className="text-zinc-500 block text-[11px] font-semibold uppercase">
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-5 border-t border-white/5 text-xs">
+          <div className="group relative overflow-hidden rounded-xl bg-zinc-900/40 backdrop-blur-md p-3.5 border border-white/5 hover:border-white/15 transition-all duration-200 hover:-translate-y-0.5">
+            <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="text-zinc-400 block text-[10px] font-bold uppercase tracking-wider">
               24h Omni-Impressions
             </span>
-            <span className="text-base font-extrabold text-white mt-0.5 block">
+            <span className="text-lg font-extrabold text-white mt-1 block tracking-tight font-display">
               {metrics?.daily_impressions ? metrics.daily_impressions.toLocaleString() : "384,250"}
             </span>
           </div>
-          <div className="bg-zinc-900/40 rounded-lg p-2.5 border border-zinc-800/50">
-            <span className="text-zinc-500 block text-[11px] font-semibold uppercase">
+          <div className="group relative overflow-hidden rounded-xl bg-zinc-900/40 backdrop-blur-md p-3.5 border border-white/5 hover:border-white/15 transition-all duration-200 hover:-translate-y-0.5">
+            <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="text-zinc-400 block text-[10px] font-bold uppercase tracking-wider">
               Click-Through Rate
             </span>
-            <span className="text-base font-extrabold text-emerald-400 mt-0.5 block">
+            <span className="text-lg font-extrabold text-emerald-400 mt-1 block tracking-tight font-display flex items-baseline gap-1.5">
               {metrics?.click_through_rate ?? 4.82}%{" "}
-              <span className="text-[10px] text-zinc-400 font-normal">SLA &gt; 3.5%</span>
+              <span className="text-[10px] text-zinc-500 font-mono font-normal">SLA &gt; 3.5%</span>
             </span>
           </div>
-          <div className="bg-zinc-900/40 rounded-lg p-2.5 border border-zinc-800/50">
-            <span className="text-zinc-500 block text-[11px] font-semibold uppercase">
-              Live Syndication Channels
+          <div className="group relative overflow-hidden rounded-xl bg-zinc-900/40 backdrop-blur-md p-3.5 border border-white/5 hover:border-white/15 transition-all duration-200 hover:-translate-y-0.5">
+            <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-sky-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="text-zinc-400 block text-[10px] font-bold uppercase tracking-wider">
+              Live Channels
             </span>
-            <span className="text-base font-extrabold text-zinc-200 mt-0.5 block">
-              6 Channels <span className="text-[10px] text-emerald-400 font-normal">100% Up</span>
+            <span className="text-lg font-extrabold text-zinc-100 mt-1 block tracking-tight font-display flex items-baseline gap-1.5">
+              6 Channels <span className="text-[10px] text-emerald-400 font-medium">100% Up</span>
             </span>
           </div>
-          <div className="bg-zinc-900/40 rounded-lg p-2.5 border border-zinc-800/50">
-            <span className="text-zinc-500 block text-[11px] font-semibold uppercase">
-              Lead Channel
+          <div className="group relative overflow-hidden rounded-xl bg-zinc-900/40 backdrop-blur-md p-3.5 border border-white/5 hover:border-white/15 transition-all duration-200 hover:-translate-y-0.5">
+            <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-rose-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="text-zinc-400 block text-[10px] font-bold uppercase tracking-wider">
+              Lead Platform
             </span>
-            <span className="text-base font-extrabold text-rose-400 mt-0.5 block">
+            <span className="text-lg font-extrabold text-rose-400 mt-1 block tracking-tight font-display flex items-baseline gap-1.5">
               {metrics?.top_channel ?? "Pinterest"}{" "}
-              <span className="text-[10px] text-zinc-400 font-normal">Rich Pin SEO</span>
+              <span className="text-[10px] text-zinc-500 font-normal">Rich Pin SEO</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* 2. Interactive C-Suite Boardroom Table (Executive Dais) */}
-      <div className="space-y-3">
+      <div className="space-y-3.5">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-300 flex items-center gap-2">
             <Users className="size-4 text-emerald-400" />
-            <span>C-Suite Boardroom Dais • Executive Officer Seats</span>
+            <span>C-Suite Boardroom Dais &bull; Executive Officer Seats</span>
           </h2>
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-zinc-500 font-medium">
             Select an officer to inspect directives &amp; mandate
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           {officers.map((officer) => {
             const isSelected = officer.id === selectedOfficerId;
             const isNyx = officer.id === "nyx";
+            const style = OFFICER_STYLES[officer.id] || DEFAULT_OFFICER_STYLE;
 
             return (
               <button
                 key={officer.id}
                 type="button"
                 onClick={() => setSelectedOfficerId(officer.id)}
-                className={`text-left p-3.5 rounded-xl border transition-all relative overflow-hidden flex flex-col justify-between ${
+                className={`group relative text-left p-4 rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between transform-gpu backdrop-blur-xl ${
                   isSelected
-                    ? isNyx
-                      ? "border-emerald-500/80 bg-zinc-900/90 shadow-lg shadow-emerald-950/30 ring-1 ring-emerald-500/40"
-                      : "border-zinc-600 bg-zinc-900/80 shadow-md ring-1 ring-zinc-500/30"
-                    : "border-zinc-800/80 bg-zinc-950/70 hover:border-zinc-700 hover:bg-zinc-900/40"
+                    ? `${style.ringColor} ring-2 bg-zinc-900/90 shadow-2xl scale-[1.01] -translate-y-0.5`
+                    : "border-white/10 bg-gradient-to-b from-zinc-900/70 via-zinc-950/80 to-zinc-950/95 hover:border-white/25 hover:bg-zinc-900/80 hover:-translate-y-1 hover:shadow-xl active:scale-[0.98]"
                 }`}
               >
+                {/* Iridescent top border accent line */}
+                <div className={`absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r ${style.borderGradient}`} />
+
                 {isNyx && (
-                  <div className="absolute top-0 right-0 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-bl border-l border-b border-emerald-500/20 flex items-center gap-1">
-                    <Radio className="size-3 animate-pulse" />
+                  <div className="absolute top-0 right-0 bg-emerald-500/15 text-emerald-300 text-[9px] font-black px-2.5 py-0.5 rounded-bl-lg border-l border-b border-emerald-500/30 flex items-center gap-1 shadow-sm backdrop-blur-md">
+                    <Radio className="size-2.5 animate-pulse text-emerald-400" />
                     <span>PRESIDING</span>
                   </div>
                 )}
 
                 <div>
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-3">
                     <div
-                      className={`size-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
-                        isNyx
-                          ? "bg-emerald-500 text-zinc-950 shadow-md shadow-emerald-500/30 font-display"
-                          : "bg-zinc-800 text-zinc-300"
-                      }`}
+                      className={`size-10 rounded-xl flex items-center justify-center font-extrabold text-xs shrink-0 bg-gradient-to-br ${style.avatarGradient} ${style.avatarText} shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:rotate-1`}
                     >
                       {officer.avatarInitials}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-sm text-white truncate">
+                        <span className="font-bold text-sm text-white truncate font-display">
                           {officer.name}
                         </span>
                         {isNyx && <Crown className="size-3.5 text-emerald-400 shrink-0" />}
                       </div>
-                      <span className="text-[11px] text-zinc-400 truncate block font-medium">
-                        {officer.title}
-                      </span>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span
+                          className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 border border-white/10 ${style.accentColor}`}
+                        >
+                          {style.roleTag}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <p className="mt-2.5 text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                  <p className="mt-2.5 text-[11px] text-zinc-300 line-clamp-2 leading-relaxed">
                     {officer.focusArea}
                   </p>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-zinc-800/60 flex items-center justify-between text-[11px]">
-                  <span className="text-zinc-500 truncate">
+                <div className="mt-3.5 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px]">
+                  <span className="text-zinc-400 truncate text-[10px] font-mono">
                     {officer.metricsSummary.split("•")[0]}
                   </span>
-                  <span
-                    className={`font-semibold capitalize px-1.5 py-0.5 rounded text-[10px] ${
-                      officer.status === "broadcasting"
-                        ? "bg-emerald-950 text-emerald-400 border border-emerald-800/60"
-                        : officer.status === "reviewing"
-                          ? "bg-blue-950 text-blue-400 border border-blue-800/60"
-                          : "bg-zinc-800 text-zinc-300"
-                    }`}
-                  >
-                    {officer.status}
-                  </span>
+                  <OfficerStatusBadge status={officer.status} />
                 </div>
               </button>
             );
@@ -685,41 +831,60 @@ export function CSuiteBoardroom() {
         </div>
 
         {/* Selected Officer Focus Brief */}
-        {selectedOfficer && (
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3.5 text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 animate-in fade-in duration-200">
-            <div className="flex items-start gap-3 min-w-0">
-              <div className="size-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-              <div>
-                <span className="text-zinc-400">
-                  Active Mandate:{" "}
-                  <strong className="text-zinc-200">{selectedOfficer.office}</strong>
+        {selectedOfficer && (() => {
+          const selectedStyle = OFFICER_STYLES[selectedOfficer.id] || DEFAULT_OFFICER_STYLE;
+          return (
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-zinc-900/80 via-zinc-950/90 to-zinc-900/80 backdrop-blur-xl p-4 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in fade-in duration-300">
+              <div className={`absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r ${selectedStyle.borderGradient}`} />
+              <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                <div
+                  className={`size-10 rounded-xl flex items-center justify-center font-extrabold text-xs shrink-0 bg-gradient-to-br ${selectedStyle.avatarGradient} ${selectedStyle.avatarText} shadow-md`}
+                >
+                  {selectedOfficer.avatarInitials}
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-extrabold text-white text-sm tracking-tight font-display">
+                      {selectedOfficer.name}
+                    </span>
+                    <span
+                      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/10 bg-white/5 ${selectedStyle.accentColor}`}
+                    >
+                      {selectedStyle.roleTag}
+                    </span>
+                    <OfficerStatusBadge status={selectedOfficer.status} />
+                  </div>
+                  <p className="text-xs text-zinc-400 mt-1 flex flex-wrap items-center gap-2">
+                    <span>
+                      Mandate: <strong className="text-zinc-200">{selectedOfficer.office}</strong>
+                    </span>
+                    <span className="text-zinc-600">&bull;</span>
+                    <span>
+                      Telemetry: <span className="text-zinc-300 font-mono">{selectedOfficer.metricsSummary}</span>
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2.5 shrink-0">
+                <span className="text-[11px] font-mono text-zinc-400 bg-zinc-950/80 px-2.5 py-1 rounded-lg border border-white/10 backdrop-blur-sm shadow-inner">
+                  LLM: {selectedOfficer.model}
                 </span>
-                <p className="text-zinc-300 mt-0.5">
-                  Officer:{" "}
-                  <span className="text-emerald-400 font-bold">{selectedOfficer.name}</span> &bull;
-                  Telemetry: <span className="text-zinc-200">{selectedOfficer.metricsSummary}</span>
-                </p>
+                {selectedOfficer.id === "nyx" && (
+                  <button
+                    type="button"
+                    onClick={handleSimulateLiveIngestion}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold text-xs transition-all duration-200 hover:-translate-y-0.5 active:scale-95 flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 cursor-pointer"
+                    title="Simulate live syndication stream ingestion"
+                  >
+                    <Sparkles className="size-3.5 text-emerald-400 animate-pulse" />
+                    <span>Simulate Stream Flow</span>
+                  </button>
+                )}
               </div>
             </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[11px] font-mono text-zinc-500 bg-zinc-950 px-2 py-1 rounded border border-zinc-800">
-                LLM: {selectedOfficer.model}
-              </span>
-              {selectedOfficer.id === "nyx" && (
-                <button
-                  type="button"
-                  onClick={handleSimulateLiveIngestion}
-                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-emerald-400 font-semibold text-xs transition flex items-center gap-1.5"
-                  title="Simulate live syndication stream ingestion"
-                >
-                  <Sparkles className="size-3" />
-                  <span>Simulate Stream Flow</span>
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* 3. Dynamic Widgets Floor Managed by Nyx Salinger */}
@@ -768,12 +933,15 @@ export function CSuiteBoardroom() {
               return (
                 <div
                   key={widget.id}
-                  className={`rounded-xl border border-zinc-800/90 bg-zinc-950 p-4 shadow-xl flex flex-col justify-between transition-all hover:border-zinc-700/80 ${colClass}`}
+                  className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/60 via-zinc-950/80 to-zinc-950/95 backdrop-blur-xl p-5 shadow-xl flex flex-col justify-between transition-all duration-300 hover:border-white/20 hover:-translate-y-1 hover:shadow-2xl ${colClass}`}
                 >
+                  {/* Subtle top edge gradient highlight */}
+                  <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
                   {/* Widget Card Header */}
-                  <div className="flex items-center justify-between gap-2 mb-3 pb-2.5 border-b border-zinc-800/70">
+                  <div className="flex items-center justify-between gap-2 mb-3.5 pb-2.5 border-b border-white/5">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="size-2 rounded-full bg-emerald-500" />
+                      <span className="size-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
                       <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-200 truncate">
                         {widget.title}
                       </h3>
