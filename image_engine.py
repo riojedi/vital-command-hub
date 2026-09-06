@@ -523,23 +523,206 @@ def resolve_feature_image(topic_title: str, persona: str = "Dex", tier: int = No
         # Default Tier 1: Selection directly from /home/ubuntu/vital-command-hub/curated_manifest.json
         return get_curated_manifest_image(slug=slug, topic_title=topic_title, mode=mode)
 
+# ==============================================================================
+# GHOST CMS DRAFT POST GENERATION ENTRY POINT
+# ==============================================================================
+def create_ghost_draft(
+    topic_title: str = "Alpine Backcountry Touring & Gear Analysis 2026",
+    persona: str = "Sierra Marlowe",
+    tier: int = 1,
+    slug: str = None,
+    html_body: str = None,
+    ghost_url: str = None,
+    admin_key: str = None,
+    mode: str = "round_robin"
+) -> dict:
+    """
+    Executes post generation with feature image resolution from curated_manifest.json
+    and pushes the resulting article directly to Ghost CMS as a draft.
+    """
+    import urllib.request
+    import urllib.error
+    import jwt
+
+    # Load environment for Ghost configuration if not passed
+    if not ghost_url or not admin_key:
+        env_files = [
+            Path("/home/ubuntu/vital4living/.env"),
+            Path("/home/ubuntu/vital-command-hub/.env"),
+            Path(__file__).resolve().parent / ".env",
+            Path(".env")
+        ]
+        for env_path in env_files:
+            if env_path.exists():
+                try:
+                    with open(env_path, "r", encoding="utf-8") as f:
+                        for line in f:
+                            line = line.strip()
+                            if line and not line.startswith("#") and "=" in line:
+                                k, v = line.split("=", 1)
+                                clean_v = v.split("#")[0].strip().strip('"').strip("'")
+                                if k == "GHOST_URL" and not ghost_url:
+                                    ghost_url = clean_v
+                                elif k == "GHOST_ADMIN_API_KEY" and not admin_key:
+                                    admin_key = clean_v
+                except Exception:
+                    pass
+
+    ghost_url = (ghost_url or "http://127.0.0.1:2368").rstrip("/")
+    if not admin_key:
+        admin_key = "6a977ae757552900019e73f1:4e017971dc33a5e28d7abd8112d34b66b7436a1594a7e2749af8b36d914142f1"
+
+    if not slug:
+        clean_s = topic_title.lower().replace(" ", "-").replace("/", "-").replace(":", "")
+        clean_s = "".join(c for c in clean_s if c.isalnum() or c == "-")
+        timestamp = int(dt.now().timestamp())
+        slug = f"{clean_s}-{timestamp}"
+
+    print("================================================================================")
+    print("🚀 LAUNCHING TEST POST GENERATION VIA CURATED MANIFEST PIPELINE")
+    print("================================================================================")
+    print(f"📌 Article Title:      {topic_title}")
+    print(f"👤 Assigned Persona:   {persona}")
+    print(f"🎯 Target Post Slug:    {slug}")
+    print(f"📊 Image Tier:         Tier {tier} (Curated Alpine Manifest)")
+
+    # 1. Resolve feature image from curated manifest
+    print("\n--------------------------------------------------------------------------------")
+    print("📷 SELECTING IMAGE FROM CURATED_MANIFEST.JSON:")
+    print("--------------------------------------------------------------------------------")
+    feature_res = resolve_feature_image(topic_title=topic_title, persona=persona, tier=tier, slug=slug, mode=mode)
+    print(f"✔ Selected Curated Image:  {feature_res.url}")
+    print(f"✔ Photographer:            {feature_res.photographer}")
+    print(f"✔ Attribution Caption:     {feature_res.caption}")
+    print(f"✔ Verified Curated Path:   {feature_res.url.startswith('/content/images/curated/')}")
+    print("--------------------------------------------------------------------------------\n")
+
+    # 2. Author mapping
+    author_slug = "sierra-marlowe"
+    persona_lower = persona.lower()
+    if "dex" in persona_lower:
+        author_slug = "dex-okafor"
+    elif "sierra" in persona_lower:
+        author_slug = "sierra-marlowe"
+    elif "wren" in persona_lower:
+        author_slug = "wren-calloway"
+    elif "bo" in persona_lower:
+        author_slug = "bo-hartley"
+    elif "niko" in persona_lower:
+        author_slug = "niko-reyes"
+    elif "nyx" in persona_lower:
+        author_slug = "nyx-salinger"
+
+    if not html_body:
+        html_body = f"""<div class="kg-card kg-html-card">
+<p class="lead">Evaluating route safety, binding elasticity, and snowpack stress factors across high-altitude ski touring routes.</p>
+<hr/>
+<h2>1. Backcountry Terrain & Load Dynamics</h2>
+<p>Alpine touring systems undergo cyclic fatigue on extended approaches. Weight distribution, toe-piece retention forces, and torsional boot-sole rigidity are critical to mission success.</p>
+<h2>2. Technical Benchmark & Field Observations</h2>
+<ul>
+  <li><strong>Weight Budget:</strong> Target sub-1,400g per binding interface for multi-day traverses.</li>
+  <li><strong>Elastic Travel:</strong> Ensure continuous lateral elasticity through varied snowpack densities.</li>
+  <li><strong>Release Calibration:</strong> ISO 13992 certified release testing under extreme temperature gradients.</li>
+</ul>
+<p><em>Field report authored by {persona}. Authenticated with local curated alpine telemetry.</em></p>
+</div>"""
+
+    # 3. Generate Ghost Admin JWT
+    kid, secret = admin_key.split(":")
+    iat = int(dt.now().timestamp())
+    header = {"alg": "HS256", "typ": "JWT", "kid": kid}
+    payload_jwt = {"iat": iat, "exp": iat + 300, "aud": "/admin/"}
+    jwt_token = jwt.encode(payload_jwt, bytes.fromhex(secret), algorithm="HS256", headers=header)
+
+    post_payload = {
+        "posts": [
+            {
+                "title": topic_title,
+                "slug": slug,
+                "status": "draft",
+                "html": html_body,
+                "feature_image": feature_res.url,
+                "feature_image_caption": feature_res.caption,
+                "feature_image_alt": feature_res.alt,
+                "visibility": "public",
+                "authors": [{"slug": author_slug}]
+            }
+        ]
+    }
+
+    req_url = f"{ghost_url}/ghost/api/admin/posts/?source=html"
+    req_data = json.dumps(post_payload).encode("utf-8")
+    req = urllib.request.Request(
+        req_url,
+        data=req_data,
+        headers={
+            "Authorization": f"Ghost {jwt_token}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+
+    print("📤 Transmitting draft post to Ghost CMS Admin API...")
+    try:
+        with urllib.request.urlopen(req) as resp:
+            resp_data = json.loads(resp.read().decode("utf-8"))
+            created_post = resp_data["posts"][0]
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode("utf-8")
+        print(f"🚨 Ghost API HTTP Error {e.code}: {error_body}")
+        raise
+
+    post_id = created_post["id"]
+    post_slug = created_post["slug"]
+    post_status = created_post["status"]
+    assigned_feature_image = created_post.get("feature_image")
+    primary_author = created_post.get("primary_author", {}).get("name", "Unknown")
+
+    print("\n================================================================================")
+    print("🎉 SUCCESS! NEW GHOST DRAFT CREATED WITH CURATED MANIFEST IMAGE!")
+    print("================================================================================")
+    print(f"🆔 Ghost Post ID:       {post_id}")
+    print(f"📌 Post Title:           {created_post['title']}")
+    print(f"🔗 Slug:                 {post_slug}")
+    print(f"📄 Publication Status:   {post_status}")
+    print(f"👤 Primary Author:       {primary_author} (slug: '{author_slug}')")
+    print(f"🖼 Ghost Feature Image:  {assigned_feature_image}")
+    print(f"📷 Caption:              {created_post.get('feature_image_caption')}")
+    print(f"🌐 Admin Editor Link:    http://15.204.83.117:2368/ghost/#/editor/post/{post_id}")
+    print(f"🌐 Public Draft Link:    http://15.204.83.117:2368/{post_slug}/")
+    print("================================================================================\n")
+
+    return created_post
+
 if __name__ == "__main__":
-    print("Testing Curated Manifest Loader & Selection Engine:")
-    manifest = load_curated_manifest()
-    print(f"Total photos in manifest: {len(manifest)}")
+    import sys
+    if any(arg in sys.argv for arg in ["--create-draft", "--draft", "create-draft"]):
+        title_arg = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("--") else "Alpine Backcountry Touring & Gear Analysis 2026"
+        persona_arg = sys.argv[3] if len(sys.argv) > 3 and not sys.argv[3].startswith("--") else "Sierra Marlowe"
+        create_ghost_draft(topic_title=title_arg, persona=persona_arg)
+    else:
+        print("Testing Curated Manifest Loader & Selection Engine:")
+        manifest = load_curated_manifest()
+        print(f"Total photos in manifest: {len(manifest)}")
 
-    print("\n1. Round-Robin Invocations:")
-    for i in range(3):
-        res = get_curated_manifest_image(mode="round_robin")
-        print(f"  [RR {i+1}] Path: {res.url} | Photographer: {res.photographer}")
+        print("\n1. Round-Robin Invocations:")
+        for i in range(3):
+            res = get_curated_manifest_image(mode="round_robin")
+            print(f"  [RR {i+1}] Path: {res.url} | Photographer: {res.photographer}")
 
-    print("\n2. Random Invocations:")
-    for i in range(3):
-        res = get_curated_manifest_image(mode="random")
-        print(f"  [RND {i+1}] Path: {res.url} | Photographer: {res.photographer}")
+        print("\n2. Random Invocations:")
+        for i in range(3):
+            res = get_curated_manifest_image(mode="random")
+            print(f"  [RND {i+1}] Path: {res.url} | Photographer: {res.photographer}")
 
-    print("\n3. Testing resolve_feature_image default (Tier 1):")
-    res_default = resolve_feature_image("Alpine Backcountry Touring Guide", "Dex")
-    print(f"  Result URL: {res_default.url}")
-    print(f"  Result Caption: {res_default.caption}")
-    print(f"  Starts with /content/images/curated/: {res_default.url.startswith('/content/images/curated/')}")
+        print("\n3. Testing resolve_feature_image default (Tier 1):")
+        res_default = resolve_feature_image("Alpine Backcountry Touring Guide", "Dex")
+        print(f"  Result URL: {res_default.url}")
+        print(f"  Result Caption: {res_default.caption}")
+        print(f"  Starts with /content/images/curated/: {res_default.url.startswith('/content/images/curated/')}")
+
+        if "--test-all" in sys.argv:
+            print("\nExecuting full draft creation test:")
+            create_ghost_draft()
+
