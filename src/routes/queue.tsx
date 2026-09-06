@@ -100,11 +100,11 @@ function QueuePage() {
     if (!newTitle.trim()) return;
     setSubmitting(true);
     try {
-      const res = await fetch("http://15.204.83.117:8000/api/queue", {
+      const res = await fetch(`${getApiBaseUrl()}/api/queue`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("v4l_api_token") || "sk-v4l-MdI7-aclT18hH:6V4-uklvH-2026"}`
+          "Authorization": `Bearer ${getAuthToken() || ""}`
         },
         body: JSON.stringify({
           topic_title: newTitle.trim(),
