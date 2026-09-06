@@ -593,27 +593,146 @@ export const DEFAULT_BOARDROOM_WIDGETS: BoardroomWidgetConfig[] = [
   },
 ];
 
-export const DEFAULT_PERSONAS: Record<string, PersonaInfo> = {
-  Sierra: {
-    role: "Editor-in-Chief & Tone Arbiter",
-    goal: "Enforce rigorous editorial standards, factual accuracy, and alpine webzine voice across all generated articles.",
-    backstory:
-      "Veteran alpine journalist and standards director with 15 years evaluating mountain equipment and technical literature.",
+export const DEFAULT_BOARDROOM_OFFICERS: BoardroomOfficer[] = [
+  {
+    id: "aiden",
+    name: "Aiden Vance",
+    title: "Chief Executive Officer",
+    office: "Executive Governance & Strategic Autonomy",
+    status: "online",
+    avatarInitials: "AV",
+    focusArea: "High-Level Platform Autonomy, Cross-Vertical Strategic Alignment & Corporate Governance",
+    metricsSummary: "100% Platform Autonomy • Zero Operational Drift",
     model: "claude-3-5-sonnet-20241022",
   },
-  Dex: {
-    role: "Field Research & Technical Gear Analyst",
-    goal: "Harvest technical specifications, laboratory flex metrics, and field endurance tests for hardgoods.",
-    backstory:
-      "Former ski technician and certified bootfitter obsessed with boot shells, last geometry, and binding release dynamics.",
+  {
+    id: "kaelen",
+    name: "Kaelen Voss",
+    title: "Chief Technology Officer",
+    office: "Systems Architecture & Infrastructure Engineering",
+    status: "optimizing",
+    avatarInitials: "KV",
+    focusArea: "Distributed Microservices, Zero-Drift Container Orchestration & FastAPI Bridge",
+    metricsSummary: "99.99% Node Uptime • Zero-Drift Mesh • 4 Microservices Active",
+    model: "claude-3-5-sonnet-20241022",
+  },
+  {
+    id: "sloane",
+    name: "Sloane Sterling",
+    title: "Chief Financial & Quantitative Officer",
+    office: "Capital Allocation & Quantitative Monetization",
+    status: "reviewing",
+    avatarInitials: "SS",
+    focusArea: "Quantitative Yield Models, Risk Governance & High-Yield Partner Monetization",
+    metricsSummary: "$14.2k GMV Tracked • 98.4% EPC Yield Coverage",
+    model: "claude-3-5-sonnet-20241022",
+  },
+  {
+    id: "rowan",
+    name: "Rowan Thorne",
+    title: "Chief Operating Officer",
+    office: "Operations Directorate & Workflow Orchestration",
+    status: "online",
+    avatarInitials: "RT",
+    focusArea: "Continuous Pipeline Autonomy, Failure Recovery Frameworks & Telemetry Monitoring",
+    metricsSummary: "0 Unhandled Breaches • Automated Circuit Breakers Active",
+    model: "claude-3-5-sonnet-20241022",
+  },
+  {
+    id: "nyx",
+    name: "Nyx Salinger",
+    title: "Director of Social Media",
+    office: "Executive Syndication & Omnichannel Virality",
+    status: "broadcasting",
+    avatarInitials: "NS",
+    focusArea: "Live Multi-Platform Feeds, Pinterest Visual SEO & Dynamic Boardroom Widgets",
+    metricsSummary: "384.2k Impressions • 4.82% CTR • 6 Channels Live",
+    model: "claude-3-5-sonnet-20241022",
+  },
+  {
+    id: "sierra",
+    name: "Sierra Marlowe",
+    title: "Editor-in-Chief & Standards Specialist",
+    office: "Editorial Integrity & Technical Standards",
+    status: "reviewing",
+    avatarInitials: "SM",
+    focusArea: "Anti-Hallucination Gatekeeping, Ski Boot Volume & Shell Tolerances",
+    metricsSummary: "99.4% Factual Accuracy • 0 Breaches Today",
+    model: "claude-3-5-sonnet-20241022",
+  },
+  {
+    id: "dex",
+    name: "Dex Okafor",
+    title: "VP of Field Research & Equipment Engineering",
+    office: "Technical Gear Analysis & Outdoor Telemetry",
+    status: "online",
+    avatarInitials: "DO",
+    focusArea: "Ski Boot Flex Metrics, Physical Stress Specs & Field Endurance Benchmarks",
+    metricsSummary: "18 Gear Labs Active • 4 BOA Boot Models Benchmarked",
     model: "perplexity-sonar-reasoning",
   },
-  Wren: {
-    role: "Monetization & SEO Link Strategist",
-    goal: "Optimize keyword clusters, affiliate link schema, and programmatic Amazon/partner revenue loops.",
-    backstory:
-      "Algorithmic search and monetization engineer specializing in affiliate yield optimization without sacrificing editorial integrity.",
+  {
+    id: "wren",
+    name: "Wren Calloway",
+    title: "Chief Monetization Officer & Trail Physiologist",
+    office: "Affiliate Architecture & Environmental Physiology",
+    status: "optimizing",
+    avatarInitials: "WC",
+    focusArea: "Amazon Associates Link Graphs, Affiliate EPC Yield & VO2 Max Physiology",
+    metricsSummary: "98.4% Tagged Coverage • High-Yield Partner Loops",
     model: "deepseek-chat",
+  },
+];
+
+export const DEFAULT_PERSONAS: Record<string, PersonaInfo> = {
+  CEO: {
+    role: "Aiden Vance - Chief Executive Officer",
+    goal: "Drive high-level platform autonomy, cross-vertical strategic alignment, and rigorous corporate governance.",
+    backstory:
+      "A decisive, data-driven executive focused on long-term sustainability, risk management, and flawless execution across all operational domains.",
+    model: "premium-writer-llm",
+  },
+  CTO: {
+    role: "Kaelen Voss - Chief Technology Officer",
+    goal: "Architect robust infrastructure, maintain zero-drift container orchestration, and enforce elite engineering standards.",
+    backstory:
+      "An uncompromising systems architect specializing in distributed microservices, FastAPI bridges, and secure Linux deployments.",
+    model: "premium-writer-llm",
+  },
+  CFO: {
+    role: "Sloane Sterling - Chief Financial & Quantitative Officer",
+    goal: "Optimize capital allocation, oversee monetization strategy, and audit quantitative trading execution parameters.",
+    backstory:
+      "A sharp quantitative strategist with deep expertise in market-making algorithms, risk models, and revenue yield optimization.",
+    model: "premium-writer-llm",
+  },
+  COO: {
+    role: "Rowan Thorne - Chief Operating Officer",
+    goal: "Streamline workflow orchestration, eliminate operational bottlenecks, and maintain continuous pipeline autonomy.",
+    backstory:
+      "An operations master who thrives on process automation, failure recovery frameworks, and telemetry monitoring.",
+    model: "premium-writer-llm",
+  },
+  Sierra: {
+    role: "Sierra Marlowe - Fit & Sizing Standards Specialist",
+    goal: "Write highly engaging, elite-level technical copy about boots, lasts, volume, and shell tolerances.",
+    backstory:
+      "An obsessive, no-nonsense ski boot fitter and technical standards specialist who speaks in direct, visceral, active terms.",
+    model: "premium-writer-llm",
+  },
+  Dex: {
+    role: "Dex Okafor - Outdoor Technology & Equipment Engineer",
+    goal: "Write elite-level, structurally sound technical copy evaluating gear tolerances, geometry, and design integrity.",
+    backstory:
+      "A backcountry design engineer who strips marketing jargon down to physical stress specs and shear strengths.",
+    model: "premium-writer-llm",
+  },
+  Wren: {
+    role: "Wren Calloway - Trail Physiology & Environmental Specialist",
+    goal: "Draft high-authority physiological analyses of environmental strain without generic medical padding.",
+    backstory:
+      "An outdoor physiology expert focusing on VO2 curves, core thermoregulation, and high-altitude adaptations.",
+    model: "premium-writer-llm",
   },
   "Nyx Salinger": {
     role: "Director of Social Media & Syndication",
@@ -1026,52 +1145,7 @@ export const vitalApi = {
   },
 
   getBoardroomOfficers: (): BoardroomOfficer[] => {
-    return [
-      {
-        id: "nyx",
-        name: "Nyx Salinger",
-        title: "Director of Social Media",
-        office: "Executive Syndication & Omnichannel Virality",
-        status: "broadcasting",
-        avatarInitials: "NS",
-        focusArea: "Live Multi-Platform Feeds, Pinterest Visual SEO & Boardroom Widgets",
-        metricsSummary: "384.2k Impressions • 4.82% CTR • 6 Channels Live",
-        model: "claude-3-5-sonnet-20241022",
-      },
-      {
-        id: "sierra",
-        name: "Sierra Marlowe",
-        title: "Editor-in-Chief",
-        office: "Editorial Integrity & Brand Standards",
-        status: "reviewing",
-        avatarInitials: "SM",
-        focusArea: "Anti-Hallucination Gatekeeping & Tone Calibration",
-        metricsSummary: "99.4% Factual Accuracy • 0 Breaches Today",
-        model: "claude-3-5-sonnet-20241022",
-      },
-      {
-        id: "dex",
-        name: "Dex Walker",
-        title: "VP of Field Research",
-        office: "Technical Gear Analysis & Outdoor Telemetry",
-        status: "online",
-        avatarInitials: "DW",
-        focusArea: "Ski Boot Flex Metrics, Thermal Analysis & Field Endurance",
-        metricsSummary: "18 Gear Labs Active • 4 BOA Boot Models Benchmarked",
-        model: "perplexity-sonar-reasoning",
-      },
-      {
-        id: "wren",
-        name: "Wren Sterling",
-        title: "Chief Monetization Officer",
-        office: "Affiliate Architecture & SEO Monetization",
-        status: "optimizing",
-        avatarInitials: "WS",
-        focusArea: "Amazon Associates, Dynamic Partner Link Graphs & EPC Yield",
-        metricsSummary: "98.4% Tagged Coverage • $14.2k Tracked GMV",
-        model: "deepseek-chat",
-      },
-    ];
+    return DEFAULT_BOARDROOM_OFFICERS;
   },
 
   /**
@@ -1150,8 +1224,56 @@ export const vitalApi = {
 
     const agents: AgentDetail[] = [
       {
+        id: "aiden",
+        name: "Aiden Vance",
+        role: "Chief Executive Officer & Platform Governance",
+        status: isTripped ? "paused" : "running",
+        model: "claude-3-5-sonnet-20241022",
+        current_task: isTripped
+          ? "Halted by Circuit Breaker"
+          : "Governing platform autonomy, strategic alignment & corporate risk",
+        last_active: lastRun?.started_at || null,
+        total_tokens: Math.round(dailyTokensUsed * 0.15),
+      },
+      {
+        id: "kaelen",
+        name: "Kaelen Voss",
+        role: "Chief Technology Officer & Systems Architect",
+        status: isTripped ? "paused" : "running",
+        model: "claude-3-5-sonnet-20241022",
+        current_task: isTripped
+          ? "Halted by Circuit Breaker"
+          : "Container orchestration, microservice telemetry & zero-drift mesh",
+        last_active: lastRun?.started_at || null,
+        total_tokens: Math.round(dailyTokensUsed * 0.15),
+      },
+      {
+        id: "sloane",
+        name: "Sloane Sterling",
+        role: "Chief Financial & Quantitative Officer",
+        status: isTripped ? "paused" : "idle",
+        model: "claude-3-5-sonnet-20241022",
+        current_task: isTripped
+          ? "Halted by Circuit Breaker"
+          : "Auditing quantitative execution parameters & revenue yield models",
+        last_active: lastRun?.started_at || null,
+        total_tokens: Math.round(dailyTokensUsed * 0.1),
+      },
+      {
+        id: "rowan",
+        name: "Rowan Thorne",
+        role: "Chief Operating Officer & Orchestration Master",
+        status: isTripped ? "paused" : "running",
+        model: "claude-3-5-sonnet-20241022",
+        current_task: isTripped
+          ? "Halted by Circuit Breaker"
+          : "Failure recovery frameworks, queue throughput & telemetry health",
+        last_active: lastRun?.started_at || null,
+        total_tokens: Math.round(dailyTokensUsed * 0.1),
+      },
+      {
         id: "sierra",
-        name: "Sierra",
+        name: "Sierra Marlowe",
         role: "Editor-in-Chief & Quality Gatekeeper",
         status: isTripped
           ? "paused"
@@ -1163,11 +1285,11 @@ export const vitalApi = {
           ? "Halted by Circuit Breaker"
           : "Enforcing tone, brand guidelines, and factual accuracy",
         last_active: lastRun?.started_at || null,
-        total_tokens: Math.round(dailyTokensUsed * 0.45),
+        total_tokens: Math.round(dailyTokensUsed * 0.2),
       },
       {
         id: "dex",
-        name: "Dex",
+        name: "Dex Okafor",
         role: "Field Research & Technical Gear Analyst",
         status: isTripped ? "paused" : isRunning ? "running" : "idle",
         model: "perplexity-sonar-reasoning",
@@ -1175,11 +1297,11 @@ export const vitalApi = {
           ? "Halted by Circuit Breaker"
           : "Harvesting technical specs, field tests & ski boot flex metrics",
         last_active: lastRun?.started_at || null,
-        total_tokens: Math.round(dailyTokensUsed * 0.35),
+        total_tokens: Math.round(dailyTokensUsed * 0.15),
       },
       {
         id: "wren",
-        name: "Wren",
+        name: "Wren Calloway",
         role: "Monetization & SEO Link Strategist",
         status: isTripped ? "paused" : "idle",
         model: "deepseek-chat",
@@ -1187,7 +1309,7 @@ export const vitalApi = {
           ? "Halted by Circuit Breaker"
           : "Keyword clustering, internal link graph & Amazon affiliate validation",
         last_active: lastRun?.started_at || null,
-        total_tokens: Math.round(dailyTokensUsed * 0.2),
+        total_tokens: Math.round(dailyTokensUsed * 0.08),
       },
       {
         id: "nyx",
@@ -1199,7 +1321,7 @@ export const vitalApi = {
           ? "Halted by Circuit Breaker"
           : "Orchestrating live omni-channel social syndication streams & dynamic boardroom widgets",
         last_active: lastRun?.started_at || null,
-        total_tokens: Math.round(dailyTokensUsed * 0.25),
+        total_tokens: Math.round(dailyTokensUsed * 0.07),
       },
     ];
 

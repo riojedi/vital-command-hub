@@ -532,9 +532,13 @@ export function AgentControlCenter() {
                 className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none transition disabled:opacity-50"
               >
                 <option value="all">Full Autonomous Fleet (All Personas)</option>
-                <option value="Sierra">Sierra (Editor-in-Chief & Tone)</option>
-                <option value="Dex">Dex (Gear Analyst & Field Tests)</option>
-                <option value="Wren">Wren (SEO & Affiliate Monetization)</option>
+                <option value="CEO">Aiden Vance (Chief Executive Officer)</option>
+                <option value="CTO">Kaelen Voss (Chief Technology Officer)</option>
+                <option value="CFO">Sloane Sterling (Chief Financial Officer)</option>
+                <option value="COO">Rowan Thorne (Chief Operating Officer)</option>
+                <option value="Sierra">Sierra Marlowe (Editor-in-Chief & Tone)</option>
+                <option value="Dex">Dex Okafor (Gear Analyst & Field Tests)</option>
+                <option value="Wren">Wren Calloway (SEO & Affiliate Monetization)</option>
                 <option value="Nyx Salinger">Nyx Salinger (Director of Social Media)</option>
               </select>
             </div>

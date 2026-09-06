@@ -66,6 +66,7 @@ import {
   type BoardroomOfficer,
   DEFAULT_SOCIAL_STREAMS,
   DEFAULT_BOARDROOM_WIDGETS,
+  DEFAULT_BOARDROOM_OFFICERS,
 } from "@/lib/vitalApi";
 
 const PLATFORM_META: Record<
@@ -484,7 +485,7 @@ export function CSuiteBoardroom() {
             <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
               <span>Executive Command Dais</span>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full border border-zinc-700 bg-zinc-900 text-zinc-300">
-                Quorum 4/4 Seated
+                Quorum {officers.length > 0 ? `${officers.length}/${officers.length}` : "8/8"} Seated
               </span>
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-zinc-400 max-w-2xl">
