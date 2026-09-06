@@ -1,20 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { 
-  Save, 
-  ShieldCheck, 
-  SlidersHorizontal, 
-  X, 
-  UserPlus, 
-  Sparkles, 
-  Bot, 
-  Cpu, 
-  RefreshCw, 
-  Check, 
+import {
+  Save,
+  ShieldCheck,
+  SlidersHorizontal,
+  X,
+  UserPlus,
+  Sparkles,
+  Bot,
+  Cpu,
+  RefreshCw,
+  Check,
   Trash2,
   Edit3,
-  Layers
+  Layers,
 } from "lucide-react";
 import { toast } from "sonner";
 import { vitalApi, type StrategyConfig, type PersonaInfo } from "@/lib/vitalApi";
@@ -31,7 +31,8 @@ export const Route = createFileRoute("/strategy")({
       { property: "og:title", content: "Strategy & AI Staff Control — Vital4Living Autopilot" },
       {
         property: "og:description",
-        content: "Pivot agent personas, tune staff writers, and deploy editorial guidelines in real time.",
+        content:
+          "Pivot agent personas, tune staff writers, and deploy editorial guidelines in real time.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -241,8 +242,9 @@ function StrategyPage() {
 
   // Delete AI staff member
   const handleDeleteStaff = async (name: string) => {
-    if (["Sierra", "Dex", "Wren", "Bo", "Niko"].includes(name)) {
-      if (!confirm(`Warning: "${name}" is a core default staff writer. Delete anyway?`)) return;
+    if (["Sierra", "Dex", "Wren", "Bo", "Niko", "Nyx Salinger", "Nyx"].includes(name)) {
+      if (!confirm(`Warning: "${name}" is a core default executive staff officer. Delete anyway?`))
+        return;
     } else {
       if (!confirm(`Are you sure you want to remove AI staff writer "${name}"?`)) return;
     }
@@ -298,7 +300,8 @@ function StrategyPage() {
           </p>
           <h1 className="mt-1 text-3xl font-bold text-white">Strategy & AI Staff Command Center</h1>
           <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-            Select and tune individual AI staff contributors, create new specialized agents, or update global keyword and guideline mandates.
+            Select and tune individual AI staff contributors, create new specialized agents, or
+            update global keyword and guideline mandates.
           </p>
         </div>
 
@@ -379,9 +382,13 @@ function StrategyPage() {
                         <span className="font-bold text-white text-base flex items-center gap-1.5">
                           {name}
                         </span>
-                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold uppercase ${
-                          isSelected ? "bg-emerald-500 text-zinc-950" : "bg-zinc-800 text-zinc-400"
-                        }`}>
+                        <span
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold uppercase ${
+                            isSelected
+                              ? "bg-emerald-500 text-zinc-950"
+                              : "bg-zinc-800 text-zinc-400"
+                          }`}
+                        >
                           {isSelected ? "Active" : "Select"}
                         </span>
                       </div>
@@ -415,7 +422,9 @@ function StrategyPage() {
                       </span>
                     </h3>
                     <p className="text-xs text-zinc-400">
-                      Changes made here are saved directly to <code className="text-emerald-400 font-mono">personas.json</code> and consumed dynamically during production runs.
+                      Changes made here are saved directly to{" "}
+                      <code className="text-emerald-400 font-mono">personas.json</code> and consumed
+                      dynamically during production runs.
                     </p>
                   </div>
                 </div>
@@ -465,9 +474,15 @@ function StrategyPage() {
                       onChange={(e) => setPersonaModel(e.target.value)}
                       className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3.5 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
                     >
-                      <option value="premium-writer-llm">premium-writer-llm (Claude 3.5 Sonnet / High Precision)</option>
-                      <option value="cheap-llm">cheap-llm (Perplexity Sonar / Fast Summaries & Drafts)</option>
-                      <option value="live-research-llm">live-research-llm (Perplexity Sonar-Pro / Live Radar Specs)</option>
+                      <option value="premium-writer-llm">
+                        premium-writer-llm (Claude 3.5 Sonnet / High Precision)
+                      </option>
+                      <option value="cheap-llm">
+                        cheap-llm (Perplexity Sonar / Fast Summaries & Drafts)
+                      </option>
+                      <option value="live-research-llm">
+                        live-research-llm (Perplexity Sonar-Pro / Live Radar Specs)
+                      </option>
                     </select>
                   </div>
 
@@ -490,7 +505,8 @@ function StrategyPage() {
                     Backstory & Personality Voice Tone
                   </label>
                   <p className="text-xs text-zinc-500">
-                    Defines the persona's vocabulary, biases, jargon level, and strict refusal to use AI clichés.
+                    Defines the persona's vocabulary, biases, jargon level, and strict refusal to
+                    use AI clichés.
                   </p>
                   <textarea
                     rows={9}
@@ -515,7 +531,8 @@ function StrategyPage() {
                 Active Guidelines & Editorial Mandate
               </label>
               <p className="mt-1 text-xs text-zinc-400">
-                Core tone, sizing authority rules, and editorial principles enforced across all automated articles.
+                Core tone, sizing authority rules, and editorial principles enforced across all
+                automated articles.
               </p>
               <textarea
                 id="guidelines"
@@ -558,12 +575,16 @@ function StrategyPage() {
             </div>
           </section>
 
-          <section aria-labelledby="payload" className="panel p-5 border border-zinc-800 bg-zinc-950 rounded-xl space-y-3">
+          <section
+            aria-labelledby="payload"
+            className="panel p-5 border border-zinc-800 bg-zinc-950 rounded-xl space-y-3"
+          >
             <h2 id="payload" className="text-base font-bold text-white flex items-center gap-2">
               <Cpu className="size-4 text-emerald-400" /> State Engine Payload
             </h2>
             <p className="text-xs text-zinc-400">
-              Deterministic JSON synced into PostgreSQL <code className="text-emerald-400 font-mono">operational_strategy</code> table.
+              Deterministic JSON synced into PostgreSQL{" "}
+              <code className="text-emerald-400 font-mono">operational_strategy</code> table.
             </p>
             <pre className="font-mono text-xs overflow-x-auto rounded-md border border-zinc-800 bg-zinc-900/80 p-3.5 text-emerald-300/90 leading-relaxed max-h-[500px]">
               {JSON.stringify(outgoingPayload, null, 2)}
@@ -593,7 +614,9 @@ function StrategyPage() {
             <form onSubmit={handleCreateStaff} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold uppercase text-zinc-400">Short Name</label>
+                  <label className="text-xs font-semibold uppercase text-zinc-400">
+                    Short Name
+                  </label>
                   <input
                     type="text"
                     required
@@ -604,7 +627,9 @@ function StrategyPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold uppercase text-zinc-400">Routing Model</label>
+                  <label className="text-xs font-semibold uppercase text-zinc-400">
+                    Routing Model
+                  </label>
                   <select
                     value={newStaffModel}
                     onChange={(e) => setNewStaffModel(e.target.value)}
@@ -618,7 +643,9 @@ function StrategyPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold uppercase text-zinc-400">Full Role Title</label>
+                <label className="text-xs font-semibold uppercase text-zinc-400">
+                  Full Role Title
+                </label>
                 <input
                   type="text"
                   required
@@ -630,7 +657,9 @@ function StrategyPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold uppercase text-zinc-400">Editorial Goal</label>
+                <label className="text-xs font-semibold uppercase text-zinc-400">
+                  Editorial Goal
+                </label>
                 <textarea
                   required
                   rows={2}
@@ -642,7 +671,9 @@ function StrategyPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold uppercase text-zinc-400">Backstory & Voice Guidelines</label>
+                <label className="text-xs font-semibold uppercase text-zinc-400">
+                  Backstory & Voice Guidelines
+                </label>
                 <textarea
                   required
                   rows={4}

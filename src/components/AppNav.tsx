@@ -13,6 +13,7 @@ import {
   Bot,
   Menu,
   X,
+  Users,
 } from "lucide-react";
 import mark from "@/assets/autopilot-mark.png";
 import { useHealth } from "@/lib/bridge-queries";
@@ -20,6 +21,7 @@ import { vitalApi, getAuthToken } from "@/lib/vitalApi";
 
 const LINKS = [
   { to: "/", label: "Overview", icon: Gauge },
+  { to: "/boardroom", label: "Boardroom", icon: Users },
   { to: "/agents", label: "Agent Control", icon: Bot },
   { to: "/queue", label: "Editorial queue", icon: ListChecks },
   { to: "/telemetry", label: "Telemetry", icon: Server },

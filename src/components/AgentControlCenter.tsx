@@ -19,7 +19,7 @@ import {
   Layers,
   Lock,
   RotateCcw,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -29,7 +29,7 @@ import {
   type AgentFleetStatus,
   type AgentDetail,
   ApiError,
-  UnauthorizedError
+  UnauthorizedError,
 } from "@/lib/vitalApi";
 
 export function AgentControlCenter() {
@@ -56,9 +56,14 @@ export function AgentControlCenter() {
     } catch (err: unknown) {
       if (err instanceof UnauthorizedError || (err instanceof ApiError && err.status === 401)) {
         setIsUnauthorized(true);
-        setError("Unauthorized (401): Dynamic 'v4l_api_token' is missing or expired. Please authenticate.");
+        setError(
+          "Unauthorized (401): Dynamic 'v4l_api_token' is missing or expired. Please authenticate.",
+        );
       } else {
-        const msg = err instanceof Error ? err.message : "Failed to retrieve agent status from FastAPI gateway (/api/agents).";
+        const msg =
+          err instanceof Error
+            ? err.message
+            : "Failed to retrieve agent status from FastAPI gateway (/api/agents).";
         setError(msg);
       }
     } finally {
@@ -101,7 +106,9 @@ export function AgentControlCenter() {
   // Handle manual trigger run
   const handleTriggerRun = async () => {
     if (fleetStatus?.circuit_breaker.tripped) {
-      toast.error("Execution Blocked: Circuit Breaker is tripped. Reset breaker before launching runs.");
+      toast.error(
+        "Execution Blocked: Circuit Breaker is tripped. Reset breaker before launching runs.",
+      );
       return;
     }
     if (userRole === "viewer") {
@@ -113,7 +120,10 @@ export function AgentControlCenter() {
     try {
       const personaArg = selectedPersona === "all" ? undefined : selectedPersona;
       const res = (await vitalApi.triggerRun(undefined, personaArg)) as { message?: string };
-      toast.success(res.message || `Agent run successfully launched for ${selectedPersona === "all" ? "Fleet" : selectedPersona}!`);
+      toast.success(
+        res.message ||
+          `Agent run successfully launched for ${selectedPersona === "all" ? "Fleet" : selectedPersona}!`,
+      );
       // Refetch immediately to catch updated status
       await fetchAgentStatus(true);
     } catch (err: unknown) {
@@ -162,7 +172,8 @@ export function AgentControlCenter() {
             Agent Control Center
           </h1>
           <p className="text-sm text-zinc-400 mt-1 max-w-2xl">
-            Real-time fleet monitoring, daily token consumption governance, manual run triggers, and automated safety circuit breakers.
+            Real-time fleet monitoring, daily token consumption governance, manual run triggers, and
+            automated safety circuit breakers.
           </p>
         </div>
 
@@ -177,7 +188,9 @@ export function AgentControlCenter() {
             }`}
             title="Toggle live 10s auto-polling"
           >
-            <span className={`size-2 rounded-full ${autoRefresh ? "bg-emerald-400 animate-pulse" : "bg-zinc-500"}`} />
+            <span
+              className={`size-2 rounded-full ${autoRefresh ? "bg-emerald-400 animate-pulse" : "bg-zinc-500"}`}
+            />
             Auto-refresh {autoRefresh ? "ON" : "OFF"}
           </button>
 
@@ -187,7 +200,9 @@ export function AgentControlCenter() {
             disabled={refreshing}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 transition disabled:opacity-50"
           >
-            <RefreshCw className={`size-3.5 ${refreshing ? "animate-spin text-emerald-400" : ""}`} />
+            <RefreshCw
+              className={`size-3.5 ${refreshing ? "animate-spin text-emerald-400" : ""}`}
+            />
             Refresh
           </button>
         </div>
@@ -201,9 +216,12 @@ export function AgentControlCenter() {
               <Lock className="size-5 text-red-400" />
             </div>
             <div>
-              <p className="text-sm font-bold text-white">401 Unauthorized: Valid 'v4l_api_token' Required</p>
+              <p className="text-sm font-bold text-white">
+                401 Unauthorized: Valid 'v4l_api_token' Required
+              </p>
               <p className="text-xs text-red-300/80">
-                Your client authorization token is missing or expired. Dynamic client-side token binding requires authentication.
+                Your client authorization token is missing or expired. Dynamic client-side token
+                binding requires authentication.
               </p>
             </div>
           </div>
@@ -232,7 +250,7 @@ export function AgentControlCenter() {
           /* TRIPPED STATE: Prominent, high-contrast critical warning banner */
           <div className="relative overflow-hidden rounded-2xl border-2 border-rose-600 bg-gradient-to-r from-rose-950/90 via-red-950/70 to-zinc-950 p-6 shadow-2xl animate-in fade-in duration-300">
             <div className="absolute top-0 right-0 -mr-10 -mt-10 size-48 rounded-full bg-rose-600/10 blur-3xl pointer-events-none" />
-            
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex items-start gap-4">
                 <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-rose-600/20 border-2 border-rose-500 text-rose-400 shadow-inner animate-pulse">
@@ -258,7 +276,8 @@ export function AgentControlCenter() {
                   {fleetStatus?.circuit_breaker?.tripped_at && (
                     <p className="text-[11px] text-rose-400/80 mt-1 font-mono flex items-center gap-1">
                       <Clock className="size-3" />
-                      Tripped at: {new Date(fleetStatus.circuit_breaker.tripped_at).toLocaleString()}
+                      Tripped at:{" "}
+                      {new Date(fleetStatus.circuit_breaker.tripped_at).toLocaleString()}
                     </p>
                   )}
                 </div>
@@ -297,20 +316,27 @@ export function AgentControlCenter() {
                     <span className="text-xs text-zinc-400">Protective Guardrails Armed</span>
                   </div>
                   <p className="text-xs text-zinc-300 mt-0.5">
-                    Continuous monitoring of daily tokens ceiling ({dailyTokens?.limit?.toLocaleString() || "1,000,000"}) and consecutive error thresholds ({fleetStatus?.circuit_breaker?.max_consecutive_failures || 5}).
+                    Continuous monitoring of daily tokens ceiling (
+                    {dailyTokens?.limit?.toLocaleString() || "1,000,000"}) and consecutive error
+                    thresholds ({fleetStatus?.circuit_breaker?.max_consecutive_failures || 5}).
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3 text-xs">
                 <div className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-right">
-                  <span className="block text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">Consecutive Failures</span>
+                  <span className="block text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
+                    Consecutive Failures
+                  </span>
                   <span className="font-mono font-bold text-emerald-400">
-                    {fleetStatus?.circuit_breaker?.consecutive_failures || 0} / {fleetStatus?.circuit_breaker?.max_consecutive_failures || 5}
+                    {fleetStatus?.circuit_breaker?.consecutive_failures || 0} /{" "}
+                    {fleetStatus?.circuit_breaker?.max_consecutive_failures || 5}
                   </span>
                 </div>
                 <div className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-right">
-                  <span className="block text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">Fleet State</span>
+                  <span className="block text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
+                    Fleet State
+                  </span>
                   <span className="font-bold text-zinc-200 capitalize">
                     {fleetStatus?.status || "Operational"}
                   </span>
@@ -324,7 +350,10 @@ export function AgentControlCenter() {
       {/* ========================================================================= */}
       {/* 2. DAILY TOKEN USAGE SECTION                                              */}
       {/* ========================================================================= */}
-      <section aria-label="Daily Token Governance" className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <section
+        aria-label="Daily Token Governance"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-5"
+      >
         {/* Token Meter Card */}
         <div className="lg:col-span-2 rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
@@ -334,17 +363,21 @@ export function AgentControlCenter() {
               </div>
               <div>
                 <h3 className="text-base font-bold text-white">Daily Token Usage</h3>
-                <p className="text-xs text-zinc-400">Live 24-hour quota telemetry against circuit breaker ceiling</p>
+                <p className="text-xs text-zinc-400">
+                  Live 24-hour quota telemetry against circuit breaker ceiling
+                </p>
               </div>
             </div>
             <div className="text-right">
-              <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded border ${
-                tokenPercentage > 85
-                  ? "bg-rose-950 text-rose-300 border-rose-800"
-                  : tokenPercentage > 60
-                  ? "bg-amber-950 text-amber-300 border-amber-800"
-                  : "bg-emerald-950 text-emerald-300 border-emerald-800"
-              }`}>
+              <span
+                className={`text-xs font-mono font-bold px-2 py-0.5 rounded border ${
+                  tokenPercentage > 85
+                    ? "bg-rose-950 text-rose-300 border-rose-800"
+                    : tokenPercentage > 60
+                      ? "bg-amber-950 text-amber-300 border-amber-800"
+                      : "bg-emerald-950 text-emerald-300 border-emerald-800"
+                }`}
+              >
                 {tokenPercentage}% of Quota
               </span>
             </div>
@@ -368,8 +401,8 @@ export function AgentControlCenter() {
                   isTripped || tokenPercentage > 85
                     ? "bg-rose-500"
                     : tokenPercentage > 60
-                    ? "bg-amber-500"
-                    : "bg-emerald-500"
+                      ? "bg-amber-500"
+                      : "bg-emerald-500"
                 }`}
                 style={{ width: `${Math.min(100, Math.max(3, tokenPercentage))}%` }}
               />
@@ -384,7 +417,10 @@ export function AgentControlCenter() {
           {dailyTokens?.model_breakdown && (
             <div className="pt-3 border-t border-zinc-900 grid grid-cols-1 sm:grid-cols-3 gap-3">
               {Object.entries(dailyTokens.model_breakdown).map(([model, stats]) => (
-                <div key={model} className="rounded-lg bg-zinc-900/60 border border-zinc-800/80 p-2.5">
+                <div
+                  key={model}
+                  className="rounded-lg bg-zinc-900/60 border border-zinc-800/80 p-2.5"
+                >
                   <span className="block text-[10px] uppercase font-mono text-zinc-400 font-bold truncate">
                     {model}
                   </span>
@@ -431,11 +467,15 @@ export function AgentControlCenter() {
               <div className="space-y-2 text-xs text-zinc-400">
                 <div className="flex justify-between border-b border-zinc-900 pb-1.5">
                   <span>Active In-flight Runs:</span>
-                  <span className="font-bold text-zinc-200 font-mono">{fleetStatus?.active_runs_count ?? 0}</span>
+                  <span className="font-bold text-zinc-200 font-mono">
+                    {fleetStatus?.active_runs_count ?? 0}
+                  </span>
                 </div>
                 <div className="flex justify-between border-b border-zinc-900 pb-1.5">
                   <span>Queued Pipeline Topics:</span>
-                  <span className="font-bold text-zinc-200 font-mono">{fleetStatus?.queued_tasks_count ?? 0}</span>
+                  <span className="font-bold text-zinc-200 font-mono">
+                    {fleetStatus?.queued_tasks_count ?? 0}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Client Token Binding:</span>
@@ -460,7 +500,10 @@ export function AgentControlCenter() {
       {/* ========================================================================= */}
       {/* 3. ACTION BAR: MANUAL TRIGGER RUN CONTROLS                                 */}
       {/* ========================================================================= */}
-      <section aria-label="Manual Run Trigger" className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-sm">
+      <section
+        aria-label="Manual Run Trigger"
+        className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-sm"
+      >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div>
             <div className="flex items-center gap-2">
@@ -468,13 +511,17 @@ export function AgentControlCenter() {
               <h3 className="text-base font-bold text-white">Manual Run Dispatcher</h3>
             </div>
             <p className="text-xs text-zinc-400 mt-1">
-              Trigger autonomous research, drafting, verification, and Ghost CMS publishing immediately.
+              Trigger autonomous research, drafting, verification, and Ghost CMS publishing
+              immediately.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
-              <label htmlFor="persona-select" className="text-xs font-semibold text-zinc-400 whitespace-nowrap">
+              <label
+                htmlFor="persona-select"
+                className="text-xs font-semibold text-zinc-400 whitespace-nowrap"
+              >
                 Persona:
               </label>
               <select
@@ -488,6 +535,7 @@ export function AgentControlCenter() {
                 <option value="Sierra">Sierra (Editor-in-Chief & Tone)</option>
                 <option value="Dex">Dex (Gear Analyst & Field Tests)</option>
                 <option value="Wren">Wren (SEO & Affiliate Monetization)</option>
+                <option value="Nyx Salinger">Nyx Salinger (Director of Social Media)</option>
               </select>
             </div>
 
@@ -499,8 +547,8 @@ export function AgentControlCenter() {
                 isTripped
                   ? "bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700"
                   : userRole === "viewer"
-                  ? "bg-zinc-900 text-zinc-500 cursor-not-allowed border border-zinc-800"
-                  : "bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 cursor-pointer hover:shadow-emerald-500/20"
+                    ? "bg-zinc-900 text-zinc-500 cursor-not-allowed border border-zinc-800"
+                    : "bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 cursor-pointer hover:shadow-emerald-500/20"
               }`}
             >
               {triggering ? (
@@ -541,7 +589,9 @@ export function AgentControlCenter() {
         {loading ? (
           <div className="py-16 text-center text-zinc-500 flex flex-col items-center gap-3">
             <RefreshCw className="size-7 animate-spin text-emerald-500" />
-            <p className="text-xs uppercase tracking-wider font-semibold">Querying FastAPI backend (/api/agents)...</p>
+            <p className="text-xs uppercase tracking-wider font-semibold">
+              Querying FastAPI backend (/api/agents)...
+            </p>
           </div>
         ) : !fleetStatus?.agents || fleetStatus.agents.length === 0 ? (
           <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-8 text-center text-zinc-500">
@@ -560,8 +610,8 @@ export function AgentControlCenter() {
                     isRunning
                       ? "border-emerald-700/80 bg-emerald-950/20 ring-1 ring-emerald-500/30"
                       : isPaused
-                      ? "border-rose-900/60 bg-rose-950/10"
-                      : "border-zinc-800 bg-zinc-950 hover:border-zinc-700"
+                        ? "border-rose-900/60 bg-rose-950/10"
+                        : "border-zinc-800 bg-zinc-950 hover:border-zinc-700"
                   }`}
                 >
                   <div className="space-y-3">
@@ -581,8 +631,8 @@ export function AgentControlCenter() {
                           isRunning
                             ? "bg-emerald-950 text-emerald-300 border border-emerald-800 animate-pulse"
                             : isPaused
-                            ? "bg-rose-950 text-rose-300 border border-rose-800"
-                            : "bg-zinc-900 text-zinc-400 border border-zinc-800"
+                              ? "bg-rose-950 text-rose-300 border border-rose-800"
+                              : "bg-zinc-900 text-zinc-400 border border-zinc-800"
                         }`}
                       >
                         <span

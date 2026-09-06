@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AgentControlCenterRouteImport } from './routes/agent-control-center'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as BoardroomRouteImport } from './routes/boardroom'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -38,6 +39,11 @@ const AgentsRoute = AgentsRouteImport.update({
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoardroomRoute = BoardroomRouteImport.update({
+  id: '/boardroom',
+  path: '/boardroom',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/agent-control-center': typeof AgentControlCenterRoute
   '/agents': typeof AgentsRoute
   '/analytics': typeof AnalyticsRoute
+  '/boardroom': typeof BoardroomRoute
   '/login': typeof LoginRoute
   '/queue': typeof QueueRoute
   '/settings': typeof SettingsRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/agent-control-center': typeof AgentControlCenterRoute
   '/agents': typeof AgentsRoute
   '/analytics': typeof AnalyticsRoute
+  '/boardroom': typeof BoardroomRoute
   '/login': typeof LoginRoute
   '/queue': typeof QueueRoute
   '/settings': typeof SettingsRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/agent-control-center': typeof AgentControlCenterRoute
   '/agents': typeof AgentsRoute
   '/analytics': typeof AnalyticsRoute
+  '/boardroom': typeof BoardroomRoute
   '/login': typeof LoginRoute
   '/queue': typeof QueueRoute
   '/settings': typeof SettingsRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/agent-control-center'
     | '/agents'
     | '/analytics'
+    | '/boardroom'
     | '/login'
     | '/queue'
     | '/settings'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/agent-control-center'
     | '/agents'
     | '/analytics'
+    | '/boardroom'
     | '/login'
     | '/queue'
     | '/settings'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/agent-control-center'
     | '/agents'
     | '/analytics'
+    | '/boardroom'
     | '/login'
     | '/queue'
     | '/settings'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   AgentControlCenterRoute: typeof AgentControlCenterRoute
   AgentsRoute: typeof AgentsRoute
   AnalyticsRoute: typeof AnalyticsRoute
+  BoardroomRoute: typeof BoardroomRoute
   LoginRoute: typeof LoginRoute
   QueueRoute: typeof QueueRoute
   SettingsRoute: typeof SettingsRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boardroom': {
+      id: '/boardroom'
+      path: '/boardroom'
+      fullPath: '/boardroom'
+      preLoaderRoute: typeof BoardroomRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentControlCenterRoute: AgentControlCenterRoute,
   AgentsRoute: AgentsRoute,
   AnalyticsRoute: AnalyticsRoute,
+  BoardroomRoute: BoardroomRoute,
   LoginRoute: LoginRoute,
   QueueRoute: QueueRoute,
   SettingsRoute: SettingsRoute,

@@ -387,6 +387,16 @@ def get_agents():
                 "last_active": last_run.get("started_at") if last_run else None,
                 "total_tokens": int(daily_tokens * 0.20) if daily_tokens else 0,
             },
+            {
+                "id": "nyx",
+                "name": "Nyx Salinger",
+                "role": "Director of Social Media",
+                "status": "paused" if is_tripped else ("running" if is_running else "idle"),
+                "model": "claude-3-5-sonnet-20241022",
+                "current_task": "Halted by Circuit Breaker" if is_tripped else "Orchestrating live multi-channel social syndication streams & dynamic boardroom widgets",
+                "last_active": last_run.get("started_at") if last_run else None,
+                "total_tokens": int(daily_tokens * 0.25) if daily_tokens else 0,
+            },
         ]
 
         usage_percentage = round(min(100.0, (daily_tokens / CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT) * 100), 1) if CIRCUIT_BREAKER_DAILY_TOKEN_LIMIT > 0 else 0.0

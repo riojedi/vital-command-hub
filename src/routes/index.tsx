@@ -19,6 +19,7 @@ import {
   Terminal,
   ExternalLink,
   X,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MetricCard } from "@/components/MetricCard";
@@ -28,6 +29,7 @@ import { useAnalyticsData, useQueueData, useTelemetryData } from "@/lib/bridge-q
 import { ALERT_STATES, QUEUE_STATES, SLA } from "@/lib/queue-shared";
 import { vitalApi, type PipelineStatus } from "@/lib/vitalApi";
 import MonetizationPanel from "../components/MonetizationPanel";
+import { CSuiteBoardroom } from "@/components/CSuiteBoardroom";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -65,7 +67,9 @@ function Overview() {
   const [activeRole, setActiveRole] = useState("viewer");
 
   // Track active visual tabs
-  const [activeTab, setActiveTab] = useState<"dashboard" | "monetization">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "boardroom" | "monetization">(
+    "dashboard",
+  );
 
   // Hydration sync on client mount
   useEffect(() => {
@@ -293,6 +297,20 @@ function Overview() {
           Dashboard Overview
         </button>
 
+        <button
+          type="button"
+          onClick={() => setActiveTab("boardroom")}
+          className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-all ${
+            activeTab === "boardroom"
+              ? "border-emerald-500 text-white font-bold"
+              : "border-transparent text-zinc-400 hover:text-zinc-200"
+          }`}
+        >
+          <Users className="size-4 text-emerald-400" />
+          <span>C-Suite Boardroom &amp; Syndication</span>
+          <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse ml-0.5" />
+        </button>
+
         {activeRole !== "viewer" && (
           <button
             type="button"
@@ -311,6 +329,39 @@ function Overview() {
 
       {activeTab === "dashboard" && (
         <div className="space-y-6">
+          {/* Executive C-Suite Boardroom & Nyx Salinger Syndication Broadcast Strip */}
+          <div className="rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 p-4 shadow-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-lg bg-emerald-950 border border-emerald-800/60 text-emerald-400 flex items-center justify-center font-display font-extrabold text-xs shrink-0 shadow-md shadow-emerald-950/40">
+                NS
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-white">
+                    Nyx Salinger (Director of Social Media)
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60 flex items-center gap-1">
+                    <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live
+                    Syndicating
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Multi-channel syndication active across 6 platforms &bull; 384.2k 24h impressions
+                  &bull; Rich Pin &amp; Meta hooks streaming
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("boardroom")}
+              className="px-3.5 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white text-xs font-bold transition flex items-center gap-2 shrink-0 border border-zinc-700"
+            >
+              <span>Enter Boardroom</span>
+              <ExternalLink className="size-3.5 text-emerald-400" />
+            </button>
+          </div>
+
           <section aria-label="Key metrics" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <MetricCard
               label="Mean cost / article"
@@ -447,6 +498,8 @@ function Overview() {
           </div>
         </div>
       )}
+
+      {activeTab === "boardroom" && <CSuiteBoardroom />}
 
       {activeTab === "monetization" && <MonetizationPanel />}
 

@@ -15,10 +15,15 @@ export const Route = createFileRoute("/queue")({
       { title: "Editorial Queue — Vital4Living Autopilot" },
       {
         name: "description",
-        content: "Interactive monitor and control center for every article in the editorial_queue table.",
+        content:
+          "Interactive monitor and control center for every article in the editorial_queue table.",
       },
       { property: "og:title", content: "Editorial Queue — Vital4Living Autopilot" },
-      { property: "og:description", content: "Track article lifecycle states, modify processing statuses and run agents in real time." },
+      {
+        property: "og:description",
+        content:
+          "Track article lifecycle states, modify processing statuses and run agents in real time.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -28,11 +33,33 @@ export const Route = createFileRoute("/queue")({
 
 const QUEUE_CATEGORIES = [
   { id: "all", label: "All Topics", matches: () => true },
-  { id: "backlog", label: "Backlog", matches: (s: string) => ["monitored", "queued", "backlog"].includes(s) },
-  { id: "in_progress", label: "In Progress", matches: (s: string) => ["running", "generating", "researching", "validating", "monetizing", "drafting"].includes(s) },
-  { id: "review", label: "Review Needed", matches: (s: string) => ["review", "pending_approval", "verification_failed", "flagged"].includes(s) },
-  { id: "published", label: "Published", matches: (s: string) => ["published", "completed"].includes(s) },
-  { id: "quarantined", label: "Quarantined", matches: (s: string) => ["failed", "quarantined", "halted", "blocked"].includes(s) },
+  {
+    id: "backlog",
+    label: "Backlog",
+    matches: (s: string) => ["monitored", "queued", "backlog"].includes(s),
+  },
+  {
+    id: "in_progress",
+    label: "In Progress",
+    matches: (s: string) =>
+      ["running", "generating", "researching", "validating", "monetizing", "drafting"].includes(s),
+  },
+  {
+    id: "review",
+    label: "Review Needed",
+    matches: (s: string) =>
+      ["review", "pending_approval", "verification_failed", "flagged"].includes(s),
+  },
+  {
+    id: "published",
+    label: "Published",
+    matches: (s: string) => ["published", "completed"].includes(s),
+  },
+  {
+    id: "quarantined",
+    label: "Quarantined",
+    matches: (s: string) => ["failed", "quarantined", "halted", "blocked"].includes(s),
+  },
 ];
 
 const AVAILABLE_STATES = [
@@ -57,7 +84,8 @@ function QueuePage() {
   const [newScore, setNewScore] = useState(85);
   const [submitting, setSubmitting] = useState(false);
 
-  const activeCategory = QUEUE_CATEGORIES.find((c) => c.id === selectedCategory) ?? QUEUE_CATEGORIES[0]!;
+  const activeCategory =
+    QUEUE_CATEGORIES.find((c) => c.id === selectedCategory) ?? QUEUE_CATEGORIES[0]!;
   const rows = items.filter((i) => activeCategory.matches(i.status ?? "queued"));
 
   const handleStatusChange = async (queueId: number, newStatus: string) => {
@@ -75,7 +103,9 @@ function QueuePage() {
     try {
       toast.info(`Launching agent writing fleet for topic #${queueId}...`);
       await vitalApi.triggerRun(queueId, persona);
-      toast.success(`Pipeline launched for topic #${queueId}! Check Overview console for live logs.`);
+      toast.success(
+        `Pipeline launched for topic #${queueId}! Check Overview console for live logs.`,
+      );
       void query.refetch();
     } catch (err: any) {
       toast.error(err.message || "Failed to trigger run for topic");
@@ -104,14 +134,14 @@ function QueuePage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${getAuthToken() || ""}`
+          Authorization: `Bearer ${getAuthToken() || ""}`,
         },
         body: JSON.stringify({
           topic_title: newTitle.trim(),
           content_type: "article",
           persona: newPersona,
-          topic_score: Number(newScore)
-        })
+          topic_score: Number(newScore),
+        }),
       });
       if (!res.ok) throw new Error("Failed to create topic");
       toast.success(`Added "${newTitle.trim()}" to queue!`);
@@ -130,7 +160,11 @@ function QueuePage() {
       key: "id",
       header: "ID",
       sortValue: (r) => Number(r.queue_id ?? 0),
-      render: (r) => <span className="numeric text-xs text-zinc-400 font-mono">#{String(r.queue_id ?? "—")}</span>,
+      render: (r) => (
+        <span className="numeric text-xs text-zinc-400 font-mono">
+          #{String(r.queue_id ?? "—")}
+        </span>
+      ),
       className: "w-16",
     },
     {
@@ -232,7 +266,8 @@ function QueuePage() {
           </p>
           <h1 className="mt-1 text-3xl font-bold text-white">Editorial Queue & State Engine</h1>
           <p className="mt-1 text-zinc-400 text-sm">
-            {items.length} total topics organized across synchronized production phases. Change states interactively or trigger single-topic runs.
+            {items.length} total topics organized across synchronized production phases. Change
+            states interactively or trigger single-topic runs.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -265,7 +300,10 @@ function QueuePage() {
       <div className="w-full border-b border-zinc-800 pb-3">
         <div className="flex flex-row gap-2 overflow-x-auto pb-1">
           {QUEUE_CATEGORIES.map((cat) => {
-            const count = cat.id === "all" ? items.length : items.filter((i) => cat.matches(i.status ?? "queued")).length;
+            const count =
+              cat.id === "all"
+                ? items.length
+                : items.filter((i) => cat.matches(i.status ?? "queued")).length;
             const isSelected = selectedCategory === cat.id;
 
             return (
@@ -277,16 +315,14 @@ function QueuePage() {
                   "flex flex-row items-center gap-2 rounded-lg border px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all shrink-0",
                   isSelected
                     ? "border-emerald-500 bg-emerald-950/50 text-emerald-300 font-bold shadow-sm"
-                    : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
+                    : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200",
                 )}
               >
                 <span>{cat.label}</span>
                 <span
                   className={cn(
                     "flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold min-w-[20px]",
-                    isSelected
-                      ? "bg-emerald-500 text-zinc-950"
-                      : "bg-zinc-800 text-zinc-400"
+                    isSelected ? "bg-emerald-500 text-zinc-950" : "bg-zinc-800 text-zinc-400",
                   )}
                 >
                   {count}
@@ -307,7 +343,9 @@ function QueuePage() {
           const tone = stateTone(r.status ?? "queued");
           return tone === "active" ? null : tone;
         }}
-        searchable={(r) => `${r.title ?? ""} ${r.topic ?? ""} ${r.status ?? ""} ${r.claimed_by ?? ""}`}
+        searchable={(r) =>
+          `${r.title ?? ""} ${r.topic ?? ""} ${r.status ?? ""} ${r.claimed_by ?? ""}`
+        }
       />
 
       {/* Add Topic Modal */}
@@ -343,7 +381,9 @@ function QueuePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold uppercase text-zinc-400">Staff Writer</label>
+                  <label className="text-xs font-semibold uppercase text-zinc-400">
+                    Staff Writer
+                  </label>
                   <select
                     value={newPersona}
                     onChange={(e) => setNewPersona(e.target.value)}
@@ -354,10 +394,13 @@ function QueuePage() {
                     <option value="Wren">Wren (Physiology)</option>
                     <option value="Bo">Bo (Durability)</option>
                     <option value="Niko">Niko (Field Tuning)</option>
+                    <option value="Nyx Salinger">Nyx Salinger (Social Media & Syndication)</option>
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold uppercase text-zinc-400">Priority Score (1-100)</label>
+                  <label className="text-xs font-semibold uppercase text-zinc-400">
+                    Priority Score (1-100)
+                  </label>
                   <input
                     type="number"
                     min="1"
