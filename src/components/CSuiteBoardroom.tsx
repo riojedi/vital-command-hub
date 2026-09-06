@@ -219,6 +219,15 @@ const DEFAULT_OFFICER_STYLE = {
   ringColor: "ring-zinc-500/40 border-zinc-600",
 };
 
+const PERSONA_AVATAR_MAP: Record<string, string> = {
+  nyx: "http://15.204.83.117:2368/content/images/avatars/nyx-salinger.png",
+  sierra: "http://15.204.83.117:2368/content/images/avatars/sierra-marlowe.png",
+  dex: "http://15.204.83.117:2368/content/images/avatars/dex-okafor.png",
+  wren: "http://15.204.83.117:2368/content/images/avatars/wren-calloway.png",
+  bo: "http://15.204.83.117:2368/content/images/avatars/bo-hartley.png",
+  niko: "http://15.204.83.117:2368/content/images/avatars/niko-reyes.png",
+};
+
 function OfficerStatusBadge({ status }: { status: BoardroomOfficer["status"] }) {
   switch (status) {
     case "broadcasting":
@@ -792,11 +801,21 @@ export function CSuiteBoardroom() {
 
                 <div>
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`size-10 rounded-xl flex items-center justify-center font-extrabold text-xs shrink-0 bg-gradient-to-br ${style.avatarGradient} ${style.avatarText} shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:rotate-1`}
-                    >
-                      {officer.avatarInitials}
-                    </div>
+                    {PERSONA_AVATAR_MAP[officer.id.toLowerCase()] ? (
+                      <div className="size-10 rounded-xl overflow-hidden shrink-0 border border-white/20 bg-zinc-900 shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:rotate-1">
+                        <img
+                          src={PERSONA_AVATAR_MAP[officer.id.toLowerCase()]}
+                          alt={officer.name}
+                          className="size-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={`size-10 rounded-xl flex items-center justify-center font-extrabold text-xs shrink-0 bg-gradient-to-br ${style.avatarGradient} ${style.avatarText} shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:rotate-1`}
+                      >
+                        {officer.avatarInitials}
+                      </div>
+                    )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
                         <span className="font-bold text-sm text-white truncate font-display">
@@ -837,11 +856,21 @@ export function CSuiteBoardroom() {
             <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-zinc-900/80 via-zinc-950/90 to-zinc-900/80 backdrop-blur-xl p-4 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in fade-in duration-300">
               <div className={`absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r ${selectedStyle.borderGradient}`} />
               <div className="flex items-start sm:items-center gap-3.5 min-w-0">
-                <div
-                  className={`size-10 rounded-xl flex items-center justify-center font-extrabold text-xs shrink-0 bg-gradient-to-br ${selectedStyle.avatarGradient} ${selectedStyle.avatarText} shadow-md`}
-                >
-                  {selectedOfficer.avatarInitials}
-                </div>
+                {PERSONA_AVATAR_MAP[selectedOfficer.id.toLowerCase()] ? (
+                  <div className="size-10 rounded-xl overflow-hidden shrink-0 border border-white/20 bg-zinc-900 shadow-md">
+                    <img
+                      src={PERSONA_AVATAR_MAP[selectedOfficer.id.toLowerCase()]}
+                      alt={selectedOfficer.name}
+                      className="size-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className={`size-10 rounded-xl flex items-center justify-center font-extrabold text-xs shrink-0 bg-gradient-to-br ${selectedStyle.avatarGradient} ${selectedStyle.avatarText} shadow-md`}
+                  >
+                    {selectedOfficer.avatarInitials}
+                  </div>
+                )}
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-extrabold text-white text-sm tracking-tight font-display">
